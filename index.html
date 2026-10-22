@@ -1,943 +1,286 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8"<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
-  <title>首尔·釜山 8日旅行手册</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
-    :root {
-      --bg: #f8f9fc; --surface: #ffffff; --text-primary: #1a1e2b; --text-secondary: #4e5b6e;
-      --border-light: #e2e8f0; --accent: #2d6a4f; --accent-soft: #e9f5ef;
-      --card-shadow: 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.05);
-      --map-placeholder: #e9ecef; --tag-bg: #eef2f6; --todo-bg: #f1f5f9;
-      --hero-gradient-start: #1e3c2c; --hero-gradient-end: #2d6a4f;
-      --flight-bg: #e0f2fe; --flight-text: #0369a1;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0e1219; --surface: #1a212c; --text-primary: #edf2f7; --text-secondary: #a0aec0;
-        --border-light: #2d3748; --accent: #48bb78; --accent-soft: #1c3a2c;
-        --card-shadow: 0 4px 14px rgba(0,0,0,0.4); --map-placeholder: #2d3748;
-        --tag-bg: #2d3748; --todo-bg: #1e2632; --hero-gradient-start: #0f1c14; --hero-gradient-end: #1e3c2c;
-        --flight-bg: #0c4a6e; --flight-text: #7dd3fc;
-      }
-    }
-    body { background-color: var(--bg); color: var(--text-primary); padding: 16px 12px 40px; min-height: 100vh; line-height: 1.5; transition: background-color 0.2s; }
-    .app { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-    .app-header { text-align: center; padding: 8px 0 4px; }
-    .app-header h1 { font-size: 1.9rem; font-weight: 700; color: var(--text-primary); }
-    .app-header .subhead { font-size: 0.95rem; color: var(--text-secondary); margin-top: 6px; }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#dcebff">
+<meta name="description" content="首尔 · 釜山旅行手册：航班信息与起飞倒计时">
+<title>首尔 · 釜山旅行手册</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E☁️%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f6f8ff; --ink:#383a5c; --muted:#666b8a; --card:#fff; --hero:#dcebff;
+  --tile:#fff; --cloud:#fff;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#151a2e; --ink:#eef0fb; --muted:#aab1d0; --card:#1e2540; --hero:#232c4d;
+        --tile:#2a3358; --cloud:#3b4777;}
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:16px/1.5 ui-rounded,"SF Pro Rounded","Hiragino Maru Gothic ProN","PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:560px; margin:0 auto; padding:0 18px}
 
-    /* 倒计时卡片 */
-    .countdown-card { background: linear-gradient(135deg, var(--hero-gradient-start), var(--hero-gradient-end)); color: white; border-radius: 24px; padding: 20px; box-shadow: var(--card-shadow); }
-    .countdown-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.8; font-weight: 500; }
-    .next-event { font-size: 1.15rem; font-weight: 600; margin-top: 6px; margin-bottom: 14px; }
-    .timer { display: flex; gap: 12px; justify-content: flex-start; flex-wrap: wrap; }
-    .time-block { background: rgba(255,255,255,0.15); border-radius: 14px; padding: 10px 14px; min-width: 68px; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
-    .time-num { font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-    .time-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-top: 4px; }
-    .tz-note { font-size: 0.75rem; opacity: 0.8; margin-top: 12px; text-align: right; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 6px; display: inline-block; float: right; }
+/* 顶部 */
+.hero{
+  background:var(--hero); border-radius:0 0 36px 36px;
+  padding:calc(env(safe-area-inset-top,0px) + 34px) 0 32px;
+}
+.hero .wrap{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.hero h1{margin:0; font-size:clamp(30px,9vw,42px); line-height:1.15; font-weight:800; letter-spacing:.04em}
+.hero p{margin:8px 0 0; color:var(--muted); font-size:15px}
+.cloud{width:104px; flex:none}
 
-    /* 通用卡片 */
-    .card { background: var(--surface); border-radius: 24px; padding: 20px 18px; box-shadow: var(--card-shadow); border: 1px solid var(--border-light); }
-    .card-title { font-size: 1.15rem; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-    
-    /* 地点链接 & 航班链接 */
-    .location-link { display: inline-flex; align-items: center; gap: 4px; color: var(--accent); text-decoration: none; font-weight: 500; border-bottom: 1px dotted var(--accent); margin-right: 6px; }
-    .location-link::after { content: '↗'; font-size: 0.8rem; opacity: 0.7; }
-    
-    .flight-link { display: inline-flex; align-items: center; gap: 6px; background: var(--flight-bg); color: var(--flight-text); padding: 4px 10px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem; margin: 4px 0; }
-    .flight-link::after { content: '🔍查询动态'; font-size: 0.75rem; opacity: 0.8; font-weight: normal; }
-    
-    /* 多时区标签 */
-    .tz-tag { display: inline-block; background: var(--border-light); color: var(--text-secondary); padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 6px; font-weight: normal; }
+main{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 32px)}
+h2{margin:30px 0 4px; font-size:21px; font-weight:800}
+.note{margin:0 0 18px; color:var(--muted); font-size:13px}
 
-    /* 列表项 */
-    .mock-list-item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border-light); align-items: flex-start; }
-    .mock-list-item:last-child { border-bottom: none; }
-    .mock-time { font-weight: 600; color: var(--accent); min-width: 60px; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
-    .mock-content { flex: 1; color: var(--text-secondary); font-size: 0.95rem; }
-    .tag { display: inline-block; background: var(--tag-bg); color: var(--text-secondary); border-radius: 6px; padding: 2px 8px; font-size: 0.75rem; margin-top: 6px; margin-right: 6px; }
-    
-    /* 每日路线 */
-    .day-section { margin-bottom: 24px; }
-    .day-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
-    .day-header strong { font-size: 1.05rem; color: var(--text-primary); }
-    .chevron { transition: transform 0.25s; font-size: 1rem; color: var(--text-secondary); }
-    .chevron.open { transform: rotate(90deg); }
-    .day-route { display: none; background: var(--map-placeholder); border-radius: 12px; padding: 12px; margin: 10px 0; font-size: 0.85rem; color: var(--text-secondary); border-left: 4px solid var(--accent); }
-    
-    /* 提示框 */
-    .alert-box { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; padding: 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; }
-    @media (prefers-color-scheme: dark) { .alert-box { background: #3a2e0c; color: #ffc107; border-left-color: #ffc107; } }
-    
-    /* 待办事项 */
-    .todo-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .todo-list li { padding: 12px 16px; background: var(--todo-bg); border-radius: 12px; font-size: 0.95rem; border-left: 4px solid var(--accent); }
-    .footer-note { text-align: center; font-size: 0.75rem; color: var(--text-secondary); opacity: 0.7; padding-top: 8px; }
-  </style>
+/* 每位旅客一种糖果色 */
+.pass.pink{--c:#ff8fab; --cbg:#ffe6ec}
+.pass.mint{--c:#4cc9a0; --cbg:#dcf7ec}
+@media (prefers-color-scheme:dark){
+  .pass.pink{--cbg:#46283a}
+  .pass.mint{--cbg:#21463c}
+}
+
+.pass{
+  margin:0 0 24px; overflow:hidden; border:2px solid var(--c); border-radius:28px;
+  background:var(--card); box-shadow:0 6px 0 var(--cbg);
+}
+.stub{background:var(--cbg); padding:18px 18px 20px}
+.stub-h{display:flex; align-items:center; justify-content:space-between; gap:8px}
+.who{
+  padding:4px 15px; border-radius:999px; background:var(--c); color:#2b2d4a;
+  font-size:17px; font-weight:800; letter-spacing:.06em;
+}
+.route{display:flex; align-items:center; gap:6px; color:var(--muted); font-size:14px}
+.plane{width:18px; height:18px; transform:rotate(90deg); flex:none}
+
+.cd-label{margin:18px 0 10px; color:var(--muted); font-size:14px}
+.tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
+.tile{text-align:center}
+.flap{
+  display:block; padding:13px 0 11px; border-radius:18px; background:var(--tile); color:var(--ink);
+  font-size:clamp(28px,9vw,38px); line-height:1; font-weight:800; font-variant-numeric:tabular-nums;
+  box-shadow:0 3px 0 rgba(0,0,0,.06);
+}
+.unit{display:block; margin-top:7px; color:var(--muted); font-size:12px}
+.cd-status{margin:18px 0 0; font-size:22px; font-weight:800}
+
+/* 航段 */
+.legs{margin:0; padding:20px 18px 4px; list-style:none; border-top:2px dashed var(--c)}
+.leg{padding-bottom:20px}
+.leg-h{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px}
+.fno{
+  display:inline-flex; align-items:center; gap:8px; padding:5px 14px; border-radius:999px;
+  background:var(--cbg); color:var(--ink); font-size:14px; text-decoration:none;
+}
+.fno .air{color:var(--muted)}
+.fno b{font-size:15px; font-weight:800; letter-spacing:.04em}
+.fno svg{width:14px; height:14px; flex:none}
+.fno:hover,.fno:active{background:var(--c); color:#2b2d4a}
+.fno:hover .air,.fno:active .air{color:#2b2d4a}
+.fno:focus-visible{outline:3px solid var(--c); outline-offset:2px}
+.date{color:var(--muted); font-size:13px; white-space:nowrap}
+
+.row{display:grid; grid-template-columns:1fr 52px 1fr; gap:6px; align-items:start}
+.end.r{text-align:right}
+.place{color:var(--muted); font-size:13px}
+.place b{color:var(--ink); font-size:15px; letter-spacing:.04em}
+.time{font-size:30px; line-height:1.2; font-weight:800; font-variant-numeric:tabular-nums}
+.next{margin-left:6px; color:var(--muted); font-size:12px; font-weight:500}
+.tz{margin-top:2px; color:var(--muted); font-size:12px; line-height:1.4}
+.mid{display:flex; align-items:center; gap:3px; margin-top:34px; color:var(--c)}
+.mid::before,.mid::after{content:""; flex:1; border-top:2px dotted var(--c)}
+.layover{
+  margin:0 0 20px; padding:9px 12px; border-radius:14px;
+  background:var(--cbg); color:var(--muted); font-size:13px; text-align:center;
+}
+.foot{margin:4px 2px 0; color:var(--muted); font-size:12.5px; line-height:1.7}
+</style>
 </head>
 <body>
-  <div class="app">
-    <header class="app-header">
-      <h1>首尔·釜山 8日</h1>
-      <div class="subhead">旅行手册 · 2人 · 10.30 - 11.07</div>
-    </header>
 
-    <!-- 此刻关注：倒计时 -->
-    <div class="countdown-card">
-      <div class="countdown-label">此刻关注 · 下一个行程</div>
-      <div class="next-event" id="nextEventText">ZZY 从悉尼起飞 / CSR 从昆明起飞</div>
-      <div class="timer" id="timerDisplay">
-        <div class="time-block"><div class="time-num" id="days">--</div><div class="time-label">天</div></div>
-        <div class="time-block"><div class="time-num" id="hours">--</div><div class="time-label">时</div></div>
-        <div class="time-block"><div class="time-num" id="minutes">--</div><div class="time-label">分</div></div>
-        <div class="time-block"><div class="time-num" id="seconds">--</div><div class="time-label">秒</div></div>
-      </div>
-      <div class="tz-note">⏰ 基准：韩国时间 KST (UTC+9)</div>
-      <div style="clear:both;"></div>
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <h1>首尔 · 釜山</h1>
+      <p>旅行手册，2026年10月30日出发</p>
     </div>
-
-    <!-- 行程总览地图 -->
-    <div class="card">
-      <div class="card-title"><span>🗺️</span> 行程总览</div>
-      <div style="background:var(--map-placeholder); border-radius:18px; height:160px; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:0.9rem; border:1.5px dashed var(--border-light); margin-bottom:12px;">
-        <svg width="100%" height="100%" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid meet" style="display:block; opacity:0.7;">
-          <path d="M30,80 Q70,30 120,50 Q170,70 210,30 Q250,10 280,50" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-dasharray="6 4" />
-          <circle cx="30" cy="80" r="6" fill="var(--accent)" />
-          <circle cx="120" cy="50" r="6" fill="var(--accent)" opacity="0.8" />
-          <circle cx="210" cy="30" r="6" fill="var(--accent)" opacity="0.6" />
-          <circle cx="280" cy="50" r="6" fill="var(--accent)" />
-          <text x="18" y="100" font-size="8" fill="var(--text-secondary)">首尔</text>
-          <text x="265" y="70" font-size="8" fill="var(--text-secondary)">釜山</text>
-        </svg>
-      </div>
-      <div style="font-size:0.85rem; color:var(--text-secondary); text-align:center;">
-        首尔(面包山酒店) → 釜山(海云台豪德经典酒店)
-      </div>
-    </div>
-
-    <!-- 航班与酒店确认 -->
-    <div class="card">
-      <div class="card-title"><span>✈️</span> 航班与住宿信息</div>
-      
-      <div class="mock-list-item">
-        <div class="mock-time">10.30</div>
-        <div class="mock-content">
-          <strong>ZZY 航班：</strong>悉尼 → 仁川<br>
-          <a href="https://www.veryzhun.com/search/?keyword=TW502" target="_blank" class="flight-link">TW502</a> 
-          <span class="tz-tag">韩国时间(KST)</span><br>
-          <span style="font-size:0.8rem; opacity:0.8;">* 请以票面时间为准，点击查询实时动态</span>
-        </div>
-      </div>
-      
-      <div class="mock-list-item">
-        <div class="mock-time">10.30</div>
-        <div class="mock-content">
-          <strong>CSR 航班：</strong>昆明 → 青岛 → 仁川<br>
-          <a href="https://www.veryzhun.com/search/?keyword=FM9415" target="_blank" class="flight-link">FM9415</a> 
-          <a href="https://www.veryzhun.com/search/?keyword=MU2043" target="_blank" class="flight-link">MU2043</a><br>
-          <span class="tz-tag">中国时间(CST)</span> 转 <span class="tz-tag">韩国时间(KST)</span>
-        </div>
-      </div>
-
-      <div class="mock-list-item">
-        <div class="mock-time">🏨 首尔</div>
-        <div class="mock-content">
-          <a href="#" class="location-link" onclick="openGoogleMaps('面包山酒店 首尔'); return false;">面包山酒店</a><br>
-          地址：7 Jong-ro 18-gil, Jongno-gu, Seoul
-        </div>
-      </div>
-      <div class="mock-list-item">
-        <div class="mock-time">🏨 釜山</div>
-        <div class="mock-content">
-          <a href="#" class="location-link" onclick="openGoogleMaps('海云台豪德经典酒店 釜山'); return false;">海云台豪德经典酒店</a><br>
-          地址：15 Haeun-daero 594beon-gil, Haeundae-gu, Busan
-        </div>
-      </div>
-    </div>
-
-    <!-- 逐日行程 -->
-    <div class="card">
-      <div class="card-title"><span>📅</span> 逐日行程</div>
-
-      <!-- Day 1 -->
-      <div class="day-section">
-        <div class="day-header" onclick="toggleDayRoute(this)">
-          <strong>10/30 (三) · 双人汇合 & 弘大</strong>
-          <span class="chevron">›</span>
-        </div>
-        <div class="day-route">
-          📍 <a href="#" class="location-link" onclick="openGoogleMaps('仁川国际机场 首尔'); return false;">仁川机场</a> → 
-          <a href="#" class="location-link" onclick="openGoogleMaps('面包山酒店 首尔'); return false;">酒店寄存</a> → 
-          <a href="#" class="location-link" onclick="openGoogleMaps('弘大入口站 首尔'); return false;">弘大入口站</a>
-        </div>
-        <div class="alert-box">
-          ⏳ 因为两人出发地不同，ZZY抵达较早。建议 ZZY 先在机场休息/逛免税店，等 CSR 下午落地后一起坐机场快线/大巴去酒店。
-        </div>
-        <div class="mock-list-item"><div class="mock-time">上午</div><div class="mock-content">ZZY 抵达仁川机场 T2（假设），等待 CSR 落地。</div></div>
-        <div class="mock-list-item"><div class="mock-time">下午</div><div class="mock-content">CSR 抵达。两人在机场汇合，一同前往首尔市区酒店办理入住/寄存行李。</div></div>
-        <div class="mock-list-item"><div class="mock-time">16:00</div><div class="mock-content">
-          前往弘大（乘地铁约30分钟）<br>
-          <a href="#" class="location-link" onclick="openGoogleMaps('Hongdae Flagship Salon 首尔'); return false;">Hongdae Flagship Salon</a> (预计4小时)<br>
-          逛 <a href="#" class="location-link" onclick="openGoogleMaps('Object 弘大店 首尔'); return false;">Object 文创店</a>、KTG文创店
-        </div></div>
-        <div class="mock-list-item"><div class="mock-time">19:00</div><div class="mock-content">晚餐：Hipoo维也纳咖啡 / 辣奶油烤排骨 / 土豆脊骨汤</div></div>
-      </div>
-
-      <!-- Day 2 -->
-      <div class="day-section">
-        <div class="day-header" onclick="toggleDayRoute(this)">
-          <strong>10/31 (四) · 圣水洞 & 汉江公园</strong>
-          <span class="chevron">›</span>
-        </div>
-        <div class="day-route">
-          📍 <a href="#" class="location-link" onclick="openGoogleMaps('圣水站 首尔'); return false;">圣水站</a> → 
-          Miffy Store / 各种潮牌集合店 → 
-          <a href="#" class="location-link" onclick="openGoogleMaps('纛岛汉江公园 首尔'); return false;">纛岛汉江公园</a>
-        </div>
-        <div class="mock-list-item"><div class="mock-time">10:00</div><div class="mock-content">地铁前往圣水洞（约30分钟）</div></div>
-        <div class="mock-list-item"><div class="mock-time">11:00</div><div class="mock-content">圣水洞逛街：Miffy Store、各种潮牌/文创店</div></div>
-        <div class="mock-list-item"><div class="mock-time">13:00</div><div class="mock-content">午餐：威风堂猪蹄（NCT同款）</div></div>
-        <div class="mock-list-item"><div class="mock-time">16:00</div><div class="mock-content">傍晚前往汉江公园看日落（建议打车去最近的纛岛汉江公园）</div></div>
-      </div>
-
-      <!-- Day 3 -->
-      <div class="day-section">
-        <div class="day-header" onclick="toggleDayRoute(this)">
-          <strong>11/1 (五) · 汉南洞 & 狎鸥亭（江南）</strong>
-          <span class="chevron">›</span>
-        </div>
-        <div class="day-route">
-          📍 <a href="#" class="location-link" onclick="openGoogleMaps('汉南洞 首尔'); return false;">汉南洞</a> → 
-          <a href="#" class="location-link" onclick="openGoogleMaps('狎鸥亭 首尔'); return false;">狎鸥亭</a> → 
-          <a href="#" class="location-link" onclick="openGoogleMaps('伦敦贝果博物馆 首尔'); return false;">伦敦贝果博物馆</a>
-        </div>
-        <div class="alert-box">⚠️ 汉南洞地形起伏大、楼梯多，店铺分散。交通建议直接打车（约15分钟）。</div>
-        <div class="mock-list-item"><div class="mock-time">11:00</div><div class="mock-content">打车前往汉南洞，逛店、喝咖啡（Avek Cheri / tour a tour 等）</div></div>
-        <div class="mock-list-item"><div class="mock-time">15:00</div><div class="mock-content">
-          前往狎鸥亭/江南：<br>
-          <a href="#" class="location-link" onclick="openGoogleMaps('tulear brunch 首尔'); return false;">tulear brunch</a> / 
-          <a href="#" class="location-link" onclick="openGoogleMaps('伦敦贝果博物馆 首尔'); return false;">London Bagel Museum</a>
-        </div></div>
-      </div>
-
-      <!-- Day 4 -->
-      <div class="day-section">
-        <div class="day-header" onclick="toggleDayRoute(this)">
-          <strong>11/2 (六) · 首尔机动日</strong>
-          <span class="chevron">›</span>
-        </div>
-        <div class="day-route">📍 待补充（可作为购物补漏或休息日）</div>
-        <div class="mock-list-item"><div class="mock-time">全天</div><div class="mock-content">自由活动 / 补打卡未去的店铺</div></div>
-      </div>
-
-      <!-- Day 5 -->
-      <div class="day-section">
-        <div class="day-header" onclick="toggleDayRoute(this)">
-          <strong>11/3 (日) · 首尔 → 釜山 & 老城区</strong>
-          <span class="chevron">›</span>
-        </div>
-        <div class="day-route">
-          📍 <a href="#" class="location-link" onclick="openGoogleMaps('首尔站'); return false;">首尔站</a> (KTX) → 
-          <a href="#" class="location-link" onclick="openGoogleMaps('釜山站'); return false;">釜山站</a> → 
-          <a href="#" class="location-link" onclick="openGoogleMaps('札嘎其市场 釜山'); return false;">札嘎其市场</a> → 
-          <a href="#" class="location-link" onclick="openGoogleMaps('龙头山公园 釜山'); return false;">龙头山公园</a>
-        </div>
-        <div class="mock-list-item"><div class="mock-time">上午</div><div class="mock-content">酒店退房，钟路三街乘1号线至首尔站（15分钟），坐KTX去釜山（2.5小时）</div></div>
-        <div class="mock-list-item"><div class="mock-time">14:00</div><div class="mock-content">抵达釜山，前往海云台酒店寄存行李</div></div>
-        <div class="mock-list-item"><div class="mock-time">16:00</div><div class="mock-content">
-          前往南浦洞区域：<br>
-          <a href="#" class="location-link" onclick="openGoogleMaps('札嘎其市场 釜山'); return false;">札嘎其市场</a>（一楼挑海鲜，二楼加工）<br>
-          逛 BIFF广场、国际市场
-        </div></div>
-        <div class="mock-list-item"><div class="mock-time">18:30</div><div class="mock-content">步行至 <a href="#" class="location-link" onclick="openGoogleMaps('龙头山公园 釜山'); return false;">龙头山公园</a>，登釜山塔看夜景</div></div>
-        <div class="mock-list-item"><div class="mock-time">20:00</div><div class="mock-content">南浦洞光复路逛街吃饭，回酒店</div></div>
-      </div>
-
-      <!-- Day 6 -->
-      <div class="day-section">
-        <div class="day-header" onclick="toggleDayRoute(this)">
-          <strong>11/4 (一) · 海云台 & 胶囊小火车 & 广安里</strong>
-          <span class="chevron">›</span>
-        </div>
-        <div class="day-route">
-          📍 <a href="#" class="location-link" onclick="openGoogleMaps('海云台蓝线公园 釜山'); return false;">海云台胶囊小火车</a> → 
-          <a href="#" class="location-link" onclick="openGoogleMaps('青沙浦 釜山'); return false;">青沙浦</a> → 
-          <a href="#" class="location-link" onclick="openGoogleMaps('广安里海水浴场 釜山'); return false;">广安里海水浴场</a>
-        </div>
-        <div class="alert-box">
-          🚨 严重警告：胶囊列车通常提前4周的周二开放预订，周末和日落时段极其抢手。请务必提前定好闹钟抢票！
-        </div>
-        <div class="mock-list-item"><div class="mock-time">10:00</div><div class="mock-content">地铁2号线前往海云台，乘坐胶囊小火车</div></div>
-        <div class="mock-list-item"><div class="mock-time">12:00</div><div class="mock-content">在青沙浦下车（“小镰仓”），看红白灯塔、海边步道拍照</div></div>
-        <div class="mock-list-item"><div class="mock-time">15:00</div><div class="mock-content">去冬柏岛和APEC世峰楼散步，然后前往广安里</div></div>
-        <div class="mock-list-item"><div class="mock-time">17:00</div><div class="mock-content">
-          广安里文创逛街：Things of note / addd 等<br>
-          广安里海水浴场看广安大桥夜景，海边吃晚餐
-        </div></div>
-      </div>
-
-      <!-- Day 7 -->
-      <div class="day-section">
-        <div class="day-header" onclick="toggleDayRoute(this)">
-          <strong>11/5 (二) · 白浅滩文化村</strong>
-          <span class="chevron">›</span>
-        </div>
-        <div class="day-route">📍 <a href="#" class="location-link" onclick="openGoogleMaps('白浅滩文化村 釜山'); return false;">白浅滩文化村</a></div>
-        <div class="mock-list-item"><div class="mock-time">全天</div><div class="mock-content">前往白浅滩文化村，看海景、逛文艺小店，喝咖啡</div></div>
-      </div>
-
-      <!-- Day 8 -->
-      <div class="day-section">
-        <div class="day-header" onclick="toggleDayRoute(this)">
-          <strong>11/6 (三) · 釜山 → 首尔 → 回国</strong>
-          <span class="chevron">›</span>
-        </div>
-        <div class="day-route">📍 <a href="#" class="location-link" onclick="openGoogleMaps('釜山站'); return false;">釜山站</a> (KTX) → <a href="#" class="location-link" onclick="openGoogleMaps('仁川国际机场 T1'); return false;">仁川机场 T1</a></div>
-        <div class="mock-list-item"><div class="mock-time">上午</div><div class="mock-content">坐KTX返回首尔</div></div>
-        <div class="mock-list-item"><div class="mock-time">航班</div><div class="mock-content">从首尔 T1 航站楼飞回国</div></div>
-      </div>
-
-    </div>
-
-    <!-- 待办清单 -->
-    <div class="card">
-      <div class="card-title"><span>📋</span> 待办清单</div>
-      <ul class="todo-list">
-        <li>🚨 抢 11/4 海云台胶囊小火车票（提前4周周二开抢）</li>
-        <li>💳 预订 11/3 首尔到釜山的 KTX 车票（2人）</li>
-        <li>🗺️ 下载 Naver Map（在韩国比 Google 好用）</li>
-        <li>📶 购买韩国流量卡 / 开通漫游</li>
-        <li>🚕 注册 Kakao T（韩国打车软件）</li>
-      </ul>
-    </div>
-
-    <div class="footer-note">所有地点点击可直接唤起 Google 地图导航</div>
+    <svg class="cloud" viewBox="0 0 120 80" aria-hidden="true">
+      <g fill="var(--cloud)">
+        <circle cx="40" cy="48" r="22"/><circle cx="68" cy="36" r="26"/><circle cx="94" cy="52" r="18"/>
+        <rect x="26" y="48" width="86" height="24" rx="12"/>
+      </g>
+      <circle cx="58" cy="52" r="2.8" fill="var(--ink)"/><circle cx="78" cy="52" r="2.8" fill="var(--ink)"/>
+      <path d="M64 58q4 4.5 8 0" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="51" cy="59" r="4" fill="#ffb3c6" opacity=".8"/><circle cx="85" cy="59" r="4" fill="#ffb3c6" opacity=".8"/>
+    </svg>
   </div>
+</header>
 
-  <script>
-    // 倒计时目标：设为 10月30日 08:00 韩国时间（ZZY落地时间，待你确认后可改）
-    const COUNTDOWN_TARGET = new Date('2024-10-30T08:00:00+09:00'); 
-    
-    function updateCountdown() {
-      const now = new Date();
-      const diffMs = COUNTDOWN_TARGET - now;
-      const daysEl = document.getElementById('days');
-      const hoursEl = document.getElementById('hours');
-      const minutesEl = document.getElementById('minutes');
-      const secondsEl = document.getElementById('seconds');
+<main class="wrap">
+  <h2>航班</h2>
+  <p class="note">所有起降时间均为机场当地时间</p>
+  <div id="flights"><noscript>请开启 JavaScript 以查看航班信息和倒计时。</noscript></div>
+  <p class="foot">倒计时以你设备上的时间为准，请确认手机时间已设为自动。点击航班号可在 Google 搜索该航班。</p>
+</main>
 
-      if (diffMs <= 0) {
-        daysEl.textContent = '00'; hoursEl.textContent = '00'; minutesEl.textContent = '00'; secondsEl.textContent = '00';
-        document.getElementById('nextEventText').textContent = '行程进行中 / 已汇合';
-        return;
+<script>
+(function () {
+  'use strict';
+
+  var PLANE = '<svg class="plane" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>';
+  var SEARCH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>';
+
+  /* ---------- 数据：时间 = 机场当地时间 + 该地UTC偏移，浏览器据此得到绝对时刻 ---------- */
+  var TZ = {
+    SYD: ['Australia/Sydney', '澳大利亚东部夏令时 AEDT (UTC+11)'],
+    CN:  ['Asia/Shanghai',    '中国标准时间 CST (UTC+8)'],
+    KR:  ['Asia/Seoul',       '韩国标准时间 KST (UTC+9)']
+  };
+  function pt(code, city, iso, z) {
+    return { code: code, city: city, ts: Date.parse(iso), tz: z[0], tzName: z[1] };
+  }
+
+  // air = 页面上显示的航空公司；q = 点击后在 Google 搜索的关键词（航空公司 + 航班号）
+  var TRAVELERS = [
+    {
+      name: 'ZZY', theme: 'pink', from: '悉尼', to: '首尔', note: '',
+      legs: [{
+        no: 'TW502', air: '德威航空', q: "T'way Air TW502",
+        dep: pt('SYD', '悉尼',     '2026-10-30T12:15:00+11:00', TZ.SYD),
+        arr: pt('ICN', '首尔仁川', '2026-10-30T20:28:00+09:00', TZ.KR)
+      }]
+    },
+    {
+      name: 'CSR', theme: 'mint', from: '昆明', to: '首尔', note: '行李直达',
+      legs: [{
+        no: 'FM9415', air: '上海航空', q: 'Shanghai Airlines FM9415',
+        dep: pt('KMG', '昆明', '2026-10-30T11:40:00+08:00', TZ.CN),
+        arr: pt('TAO', '青岛', '2026-10-30T14:55:00+08:00', TZ.CN)
+      }, {
+        no: 'MU2043', air: '东方航空', q: 'China Eastern MU2043',
+        dep: pt('TAO', '青岛',     '2026-10-30T17:55:00+08:00', TZ.CN),
+        arr: pt('ICN', '首尔仁川', '2026-10-30T20:40:00+09:00', TZ.KR)
+      }]
+    }
+  ];
+
+  /* ---------- 显示：始终按机场所在时区格式化，与设备时区无关 ---------- */
+  var fc = {};
+  function fmt(tz, kind) {
+    var k = tz + kind;
+    return fc[k] || (fc[k] = new Intl.DateTimeFormat('zh-CN', kind === 't'
+      ? { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }
+      : { timeZone: tz, month: 'long', day: 'numeric', weekday: 'short' }));
+  }
+  function dur(ms) {
+    var m = Math.round(ms / 60000), h = Math.floor(m / 60), r = m % 60;
+    return (h ? h + '小时' : '') + (r ? r + '分钟' : '');
+  }
+  function end(p, right, depDate) {
+    var d = fmt(p.tz, 'd').format(p.ts);
+    var next = right && d !== depDate ? '<span class="next">' + d + '</span>' : '';
+    return '<div class="end' + (right ? ' r' : '') + '">' +
+      '<div class="place"><b>' + p.code + '</b> ' + p.city + '</div>' +
+      '<div class="time">' + fmt(p.tz, 't').format(p.ts) + next + '</div>' +
+      '<div class="tz">' + p.tzName + '</div></div>';
+  }
+  function legHTML(l) {
+    var d = fmt(l.dep.tz, 'd').format(l.dep.ts);
+    return '<li class="leg"><div class="leg-h">' +
+      '<a class="fno" href="https://www.google.com/search?q=' + encodeURIComponent(l.q) +
+      '" target="_blank" rel="noopener noreferrer">' +
+      '<span class="air">' + l.air + '</span><b>' + l.no + '</b>' + SEARCH + '</a>' +
+      '<span class="date">' + d + '</span></div>' +
+      '<div class="row">' + end(l.dep, false, d) + '<div class="mid">' + PLANE + '</div>' + end(l.arr, true, d) + '</div></li>';
+  }
+  function cardHTML(t) {
+    var legs = t.legs.map(function (l, i) {
+      var gap = '';
+      if (i > 0) {
+        gap = '<li class="layover">' + t.legs[i - 1].arr.city + '中转，停留' +
+          dur(l.dep.ts - t.legs[i - 1].arr.ts) + (t.note ? '，' + t.note : '') + '</li>';
       }
-      const totalSeconds = Math.floor(diffMs / 1000);
-      daysEl.textContent = String(Math.floor(totalSeconds / 86400)).padStart(2, '0');
-      hoursEl.textContent = String(Math.floor((totalSeconds % 86400) / 3600)).padStart(2, '0');
-      minutesEl.textContent = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-      secondsEl.textContent = String(totalSeconds % 60).padStart(2, '0');
-      document.getElementById('nextEventText').textContent = '距离 ZZY 落地首尔还有';
-    }
+      return gap + legHTML(l);
+    }).join('');
+    return '<article class="pass ' + t.theme + '"><div class="stub">' +
+      '<div class="stub-h"><span class="who">' + t.name + '</span>' +
+      '<span class="route">' + t.from + PLANE + t.to + '</span></div>' +
+      '<p class="cd-label" data-label></p>' +
+      '<div class="tiles" role="timer" data-tiles>' +
+      ['天', '时', '分', '秒'].map(function (u) {
+        return '<div class="tile"><span class="flap" data-u>00</span><span class="unit">' + u + '</span></div>';
+      }).join('') + '</div>' +
+      '<p class="cd-status" data-status hidden></p></div>' +
+      '<ul class="legs">' + legs + '</ul></article>';
+  }
 
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
+  var root = document.getElementById('flights');
+  root.innerHTML = TRAVELERS.map(cardHTML).join('');
+  TRAVELERS.forEach(function (t, i) {
+    var el = root.children[i];
+    t.label = el.querySelector('[data-label]');
+    t.tiles = el.querySelector('[data-tiles]');
+    t.status = el.querySelector('[data-status]');
+    t.nums = el.querySelectorAll('[data-u]');
+  });
 
-    // 唤起 Google 地图
-    function openGoogleMaps(place) {
-      const query = encodeURIComponent(place);
-      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
-    }
-
-    // 展开/收起路线
-    function toggleDayRoute(headerEl) {
-      const routeDiv = headerEl.nextElementSibling;
-      const chevron = headerEl.querySelector('.chevron');
-      if (routeDiv && routeDiv.classList.contains('day-route')) {
-        if (routeDiv.style.display === 'none' || !routeDiv.style.display) {
-          routeDiv.style.display = 'block';
-          if (chevron) chevron.classList.add('open');
-        } else {
-          routeDiv.style.display = 'none';
-          if (chevron) chevron.classList.remove('open');
+  /* ---------- 倒计时 ----------
+     1. 读取设备当前时间 Date.now()
+     2. 起飞时间（机场当地时间+时区）换算成设备时区的对应时刻 L[i].dep.ts
+     3. 两者相减，页面只显示结果，不显示换算过程 */
+  function update() {
+    var now = Date.now();
+    TRAVELERS.forEach(function (t) {
+      var L = t.legs, target = 0, label = '', status = '', i;
+      if (now < L[0].dep.ts) {
+        target = L[0].dep.ts; label = '距离起飞';
+      } else {
+        var done = true;
+        for (i = 0; i < L.length; i++) {
+          if (now < L[i].arr.ts) {
+            status = L.length > 1 ? '第' + (i + 1) + '程飞行中' : '飞行中';
+            done = false; break;
+          }
+          if (i < L.length - 1 && now < L[i + 1].dep.ts) {
+            target = L[i + 1].dep.ts; label = '中转中，距离第' + (i + 2) + '程起飞';
+            done = false; break;
+          }
+        }
+        if (done) status = '已抵达' + t.to;
+      }
+      t.tiles.hidden = t.label.hidden = !target;
+      t.status.hidden = !status;
+      if (status) t.status.textContent = status;
+      if (target) {
+        t.label.textContent = label;
+        var s = Math.max(0, Math.ceil((target - now) / 1000));
+        var v = [Math.floor(s / 86400), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60];
+        for (i = 0; i < 4; i++) {
+          var x = String(v[i]).padStart(2, '0');
+          if (t.nums[i].textContent !== x) t.nums[i].textContent = x;
         }
       }
-    }
-  </script>
-</body>
-</html>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
-  <title>首尔·釜山 8日旅行手册</title>
-  <style>
-    /* 基础重置 + 全局配色 (日间/夜间通过prefers-color-scheme自动切换) */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    }
-
-    :root {
-      --bg: #f8f9fc;
-      --surface: #ffffff;
-      --text-primary: #1a1e2b;
-      --text-secondary: #4e5b6e;
-      --border-light: #e2e8f0;
-      --accent: #2d6a4f;
-      --accent-soft: #e9f5ef;
-      --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.05);
-      --map-placeholder: #d9e2ec;
-      --nav-bg: #ffffff;
-      --tag-bg: #eef2f6;
-      --todo-bg: #f1f5f9;
-      --time-text: #1e293b;
-      --hero-gradient-start: #1e3c2c;
-      --hero-gradient-end: #2d6a4f;
-      --today-line: #b45309;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0e1219;
-        --surface: #1a212c;
-        --text-primary: #edf2f7;
-        --text-secondary: #a0aec0;
-        --border-light: #2d3748;
-        --accent: #48bb78;
-        --accent-soft: #1c3a2c;
-        --card-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-        --map-placeholder: #2d3748;
-        --nav-bg: #1a212c;
-        --tag-bg: #2d3748;
-        --todo-bg: #1e2632;
-        --time-text: #e2e8f0;
-        --hero-gradient-start: #0f1c14;
-        --hero-gradient-end: #1e3c2c;
-        --today-line: #f6ad55;
-      }
-    }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text-primary);
-      padding: 16px 12px 40px;
-      min-height: 100vh;
-      transition: background-color 0.2s, color 0.2s;
-      line-height: 1.5;
-    }
-
-    .app {
-      max-width: 680px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* --- 标题区 --- */
-    .app-header {
-      text-align: center;
-      padding: 8px 0 4px;
-    }
-
-    .app-header h1 {
-      font-size: 1.9rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: var(--text-primary);
-      line-height: 1.2;
-    }
-
-    .app-header .subhead {
-      font-size: 0.95rem;
-      color: var(--text-secondary);
-      margin-top: 6px;
-      font-weight: 400;
-    }
-
-    /* --- 此刻关注卡片 (倒计时) --- */
-    .countdown-card {
-      background: linear-gradient(135deg, var(--hero-gradient-start), var(--hero-gradient-end));
-      color: white;
-      border-radius: 24px;
-      padding: 20px 20px 24px;
-      box-shadow: var(--card-shadow);
-      transition: background 0.3s;
-    }
-
-    .countdown-label {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      opacity: 0.8;
-      font-weight: 500;
-    }
-
-    .next-event {
-      font-size: 1.15rem;
-      font-weight: 600;
-      margin-top: 6px;
-      margin-bottom: 14px;
-      opacity: 0.95;
-      word-break: break-word;
-    }
-
-    .timer {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-    }
-
-    .time-block {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-radius: 14px;
-      padding: 10px 14px;
-      min-width: 68px;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .time-num {
-      font-size: 1.9rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      line-height: 1.2;
-      letter-spacing: -0.5px;
-    }
-
-    .time-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      opacity: 0.7;
-      letter-spacing: 1px;
-      margin-top: 4px;
-    }
-
-    /* 时区标记 */
-    .tz-note {
-      font-size: 0.7rem;
-      opacity: 0.6;
-      margin-top: 12px;
-      text-align: right;
-    }
-
-    /* --- 占位符卡片（地图、行程等）通用样式 --- */
-    .card {
-      background: var(--surface);
-      border-radius: 24px;
-      padding: 20px 18px;
-      box-shadow: var(--card-shadow);
-      border: 1px solid var(--border-light);
-      transition: background 0.2s, border-color 0.2s;
-    }
-
-    .card-title {
-      font-size: 1.15rem;
-      font-weight: 600;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-title span {
-      font-size: 1.3rem;
-    }
-
-    .placeholder-map {
-      background: var(--map-placeholder);
-      border-radius: 18px;
-      height: 160px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      border: 1.5px dashed var(--border-light);
-      margin-bottom: 16px;
-      transition: background 0.2s;
-    }
-
-    .mock-list-item {
-      display: flex;
-      gap: 14px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border-light);
-      align-items: flex-start;
-    }
-
-    .mock-list-item:last-child {
-      border-bottom: none;
-    }
-
-    .mock-time {
-      font-weight: 600;
-      color: var(--accent);
-      min-width: 60px;
-      font-size: 0.9rem;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .mock-content {
-      flex: 1;
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-    }
-
-    .tag {
-      display: inline-block;
-      background: var(--tag-bg);
-      color: var(--text-secondary);
-      border-radius: 30px;
-      padding: 4px 12px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      margin-top: 6px;
-    }
-
-    .todo-list {
-      list-style: none;
-    }
-
-    .todo-list li {
-      padding: 12px 16px;
-      background: var(--todo-bg);
-      border-radius: 14px;
-      margin-bottom: 8px;
-      font-size: 0.95rem;
-      color: var(--text-primary);
-      border-left: 4px solid var(--accent);
-      /* 纯列表，不可勾选 */
-      user-select: none;
-    }
-
-    .footer-note {
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      opacity: 0.7;
-      padding-top: 8px;
-    }
-
-    /* 模拟可点击地点的样式 */
-    .location-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 500;
-      border-bottom: 1px dotted var(--accent);
-      cursor: pointer;
-    }
-
-    .location-link::after {
-      content: '↗';
-      font-size: 0.8rem;
-      opacity: 0.7;
-    }
-
-    /* 可展开的日标题（用于后续） */
-    .day-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .chevron {
-      transition: transform 0.25s;
-      font-size: 1rem;
-      color: var(--text-secondary);
-    }
-
-    .chevron.open {
-      transform: rotate(90deg);
-    }
-
-    /* 响应式微调 */
-    @media (max-width: 400px) {
-      .time-num {
-        font-size: 1.5rem;
-      }
-      .time-block {
-        padding: 8px 10px;
-        min-width: 58px;
-      }
-      .app-header h1 {
-        font-size: 1.6rem;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-
-    <!-- 标题 -->
-    <header class="app-header">
-      <h1>首尔·釜山 8日</h1>
-      <div class="subhead">旅行手册 · 2人 · 2025</div>
-    </header>
-
-    <!-- 此刻关注：倒计时卡片 -->
-    <div class="countdown-card" id="countdownCard">
-      <div class="countdown-label">此刻关注 · 下一个行程</div>
-      <div class="next-event" id="nextEventText">出发前准备 (待更新行程)</div>
-      <div class="timer" id="timerDisplay">
-        <div class="time-block">
-          <div class="time-num" id="days">--</div>
-          <div class="time-label">天</div>
-        </div>
-        <div class="time-block">
-          <div class="time-num" id="hours">--</div>
-          <div class="time-label">时</div>
-        </div>
-        <div class="time-block">
-          <div class="time-num" id="minutes">--</div>
-          <div class="time-label">分</div>
-        </div>
-        <div class="time-block">
-          <div class="time-num" id="seconds">--</div>
-          <div class="time-label">秒</div>
-        </div>
-      </div>
-      <div class="tz-note" id="tzNote">时区: Asia/Seoul (KST) · UTC+9</div>
-    </div>
-
-    <!-- 行程总览地图 (SVG占位) -->
-    <div class="card">
-      <div class="card-title"><span>🗺️</span> 行程总览</div>
-      <div class="placeholder-map" id="overviewMapPlaceholder">
-        <!-- 手绘风 SVG 占位，后续替换为真实路线 -->
-        <svg width="100%" height="100%" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid meet" style="display:block; opacity:0.7;">
-          <path d="M30,80 Q70,30 120,50 Q170,70 210,30 Q250,10 280,50" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-dasharray="6 4" />
-          <circle cx="30" cy="80" r="6" fill="var(--accent)" />
-          <circle cx="120" cy="50" r="6" fill="var(--accent)" opacity="0.8" />
-          <circle cx="210" cy="30" r="6" fill="var(--accent)" opacity="0.6" />
-          <circle cx="280" cy="50" r="6" fill="var(--accent)" />
-          <text x="18" y="100" font-size="8" fill="var(--text-secondary)">首尔</text>
-          <text x="265" y="70" font-size="8" fill="var(--text-secondary)">釜山</text>
-        </svg>
-      </div>
-      <div style="font-size:0.85rem; color:var(--text-secondary); text-align:center;">
-        每日路线与住宿待行程确认后绘制
-      </div>
-    </div>
-
-    <!-- 已确认的机票 / 酒店 / 门票 (占位) -->
-    <div class="card">
-      <div class="card-title"><span>✅</span> 已确认预订</div>
-      <div class="mock-list-item">
-        <div class="mock-time">航班</div>
-        <div class="mock-content">待提供机票截图 · 首尔仁川 ← 出发地</div>
-      </div>
-      <div class="mock-list-item">
-        <div class="mock-time">酒店</div>
-        <div class="mock-content">首尔 · 明洞区域 (待确认)</div>
-      </div>
-      <div class="mock-list-item">
-        <div class="mock-time">门票</div>
-        <div class="mock-content">景福宫 / 釜山胶囊列车 (待预订)</div>
-      </div>
-    </div>
-
-    <!-- 逐日行程 (占位) -->
-    <div class="card">
-      <div class="card-title"><span>📅</span> 逐日行程</div>
-
-      <!-- Day 1 演示 -->
-      <div style="margin-bottom: 20px;">
-        <div class="day-header" onclick="toggleDayRoute(this)" style="padding: 8px 0;">
-          <strong>Day 1 · 首尔抵达</strong>
-          <span class="chevron">›</span>
-        </div>
-        <div class="day-route" style="display: none; background: var(--map-placeholder); border-radius: 12px; padding: 12px; margin: 8px 0; font-size: 0.85rem; color: var(--text-secondary);">
-          📍 当日路线地图 (点击展开) · 一键多点导航待行程填充
-        </div>
-        <div class="mock-list-item">
-          <div class="mock-time">14:00</div>
-          <div class="mock-content">
-            <a href="#" class="location-link" onclick="openGoogleMaps('仁川国际机场'); return false;">仁川国际机场</a>
-            <span class="tag">需提前预约接机</span>
-          </div>
-        </div>
-        <div class="mock-list-item">
-          <div class="mock-time">18:00</div>
-          <div class="mock-content">明洞酒店入住 · 周边晚餐</div>
-        </div>
-      </div>
-
-      <!-- Day 2 演示 -->
-      <div style="margin-bottom: 20px;">
-        <div class="day-header" onclick="toggleDayRoute(this)" style="padding: 8px 0;">
-          <strong>Day 2 · 首尔经典</strong>
-          <span class="chevron">›</span>
-        </div>
-        <div class="day-route" style="display: none; background: var(--map-placeholder); border-radius: 12px; padding: 12px; margin: 8px 0; font-size: 0.85rem; color: var(--text-secondary);">
-          📍 景福宫 → 北村韩屋村 → 仁寺洞
-        </div>
-        <div class="mock-list-item">
-          <div class="mock-time">09:30</div>
-          <div class="mock-content">
-            <a href="#" class="location-link" onclick="openGoogleMaps('景福宫'); return false;">景福宫</a>
-            <span class="tag">周二闭馆 · 需核对</span>
-          </div>
-        </div>
-        <div class="mock-list-item">
-          <div class="mock-time">13:00</div>
-          <div class="mock-content">
-            <a href="#" class="location-link" onclick="openGoogleMaps('北村韩屋村'); return false;">北村韩屋村</a>
-          </div>
-        </div>
-      </div>
-
-      <div style="font-size:0.85rem; color:var(--text-secondary); text-align:center; margin-top:8px;">
-        ⏳ 等待你提供完整行程 · 将自动重排
-      </div>
-    </div>
-
-    <!-- 待办清单 (纯列表) -->
-    <div class="card">
-      <div class="card-title"><span>📋</span> 待办清单</div>
-      <ul class="todo-list">
-        <li>预订 首尔→釜山 KTX 车票 (2人)</li>
-        <li>预约 景福宫 中文讲解 (需提前)</li>
-        <li>确认 釜山胶囊列车 余票</li>
-        <li>下载 Naver Map / 韩语离线包</li>
-        <li>检查护照有效期 & 签证</li>
-      </ul>
-    </div>
-
-    <!-- 实用贴士 -->
-    <div class="card">
-      <div class="card-title"><span>💡</span> 实用贴士</div>
-      <div style="font-size:0.9rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:8px;">
-        <div>🚇 T-money 卡可在便利店购买和充值</div>
-        <div>🗣️ 热门餐厅可使用 kiosk 点餐，备翻译 App</div>
-        <div>🧳 釜山站寄存行李很方便，KTX 站内</div>
-        <div>📶 提前买好韩国流量卡或开通漫游</div>
-      </div>
-    </div>
-
-    <div class="footer-note">时间均为亚洲/首尔时区 (UTC+9) · 点击地点唤起 Google 地图</div>
-
-  </div>
-
-  <script>
-    // ---------- 时区与倒计时 ----------
-    // 当前时区显示：优先使用 Intl 检测本地时区，展示固定为 Asia/Seoul
-    // 倒计时目标：默认设置为 2025-06-01 09:00:00 KST (仅示例，后续会更新)
-    // 但我们希望页面永远显示一个合理的未来时间。可后续更新目标事件。
-    // 这里设置一个默认的“出发前准备”事件：当前时间 + 10天 作为演示
-    const COUNTDOWN_TARGET = new Date('2025-06-01T09:00:00+09:00'); // 固定示例，后续会修改
-
-    // 更新时区显示标签
-    function updateTimezoneLabel() {
-      const tzNote = document.getElementById('tzNote');
-      if (tzNote) {
-        // 显示固定时区，避免混淆
-        tzNote.textContent = '时区: Asia/Seoul (KST) · UTC+9';
-      }
-    }
-    updateTimezoneLabel();
-
-    // 倒计时主逻辑
-    function updateCountdown() {
-      const now = new Date();
-      const target = COUNTDOWN_TARGET; // 后面可改为读取实际事件
-      const diffMs = target - now;
-
-      const daysEl = document.getElementById('days');
-      const hoursEl = document.getElementById('hours');
-      const minutesEl = document.getElementById('minutes');
-      const secondsEl = document.getElementById('seconds');
-
-      if (diffMs <= 0) {
-        daysEl.textContent = '00';
-        hoursEl.textContent = '00';
-        minutesEl.textContent = '00';
-        secondsEl.textContent = '00';
-        document.getElementById('nextEventText').textContent = '行程进行中 / 已出发';
-        return;
-      }
-
-      const totalSeconds = Math.floor(diffMs / 1000);
-      const days = Math.floor(totalSeconds / 86400);
-      const hours = Math.floor((totalSeconds % 86400) / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-
-      daysEl.textContent = String(days).padStart(2, '0');
-      hoursEl.textContent = String(hours).padStart(2, '0');
-      minutesEl.textContent = String(minutes).padStart(2, '0');
-      secondsEl.textContent = String(seconds).padStart(2, '0');
-
-      // 更新事件文本（可根据需要动态变化，目前保持静态；如果目标过去则显示其他）
-      document.getElementById('nextEventText').textContent = '距离出发还有';
-    }
-
-    // 每秒更新
-    let countdownInterval = setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    // 清理定时器（可选）
-    window.addEventListener('beforeunload', function() {
-      if (countdownInterval) clearInterval(countdownInterval);
     });
+  }
+  (function loop() {
+    update();
+    setTimeout(loop, 1000 - (Date.now() % 1000) + 20); // 对齐整秒
+  })();
+  document.addEventListener('visibilitychange', update);
 
-    // ---------- 辅助交互：点击地点唤起Google地图 (示例) ----------
-    function openGoogleMaps(place) {
-      // 用编码后的地名搜索
-      const query = encodeURIComponent(place + ' 韩国');
-      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
-    }
-
-    // 每日路线展开/收起 (占位功能)
-    function toggleDayRoute(headerEl) {
-      const routeDiv = headerEl.nextElementSibling;
-      const chevron = headerEl.querySelector('.chevron');
-      if (routeDiv && routeDiv.classList.contains('day-route')) {
-        if (routeDiv.style.display === 'none' || !routeDiv.style.display) {
-          routeDiv.style.display = 'block';
-          if (chevron) chevron.classList.add('open');
-        } else {
-          routeDiv.style.display = 'none';
-          if (chevron) chevron.classList.remove('open');
-        }
-      }
-    }
-
-    // 初始化所有chevron状态
-    document.querySelectorAll('.day-header .chevron').forEach(ch => ch.classList.remove('open'));
-
-    // 让所有地点链接可点击 (演示用) — 已内联 onclick
-    // 确保点击地点不跳转
-    document.querySelectorAll('.location-link').forEach(link => {
-      link.addEventListener('click', (e) => {
-        // 如果内联onclick已阻止默认，此处无需额外操作，但以防万一
-        // 实际内联已return false
-      });
-    });
-
-    // 自动根据系统深浅色，无需额外JS，已用prefers-color-scheme
-  </script>
-
-  <!-- 后续替换：设置真实倒计时目标用下面代码，取消注释即可修改 -->
-  <!--
-  <script>
-    // 一旦有真实行程，替换目标时间即可
-    // COUNTDOWN_TARGET = new Date('2025-07-10T08:30:00+09:00');
-    // 并更新 nextEventText 为具体航班或事件
-  </script>
-  -->
+  /* ---------- 离线支持 ---------- */
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    navigator.serviceWorker.register('./sw.js').catch(function () {});
+  }
+})();
+</script>
 </body>
 </html>
