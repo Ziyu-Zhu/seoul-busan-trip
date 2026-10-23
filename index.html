@@ -273,6 +273,47 @@
 
     /* 底部说明 */
     .footer-note { text-align: center; font-size: 0.7rem; color: var(--text-light); margin-top: 12px; }
+    /* 签证小标签 */
+    .visa-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #FFF3E0;
+      color: #FF8A00;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-decoration: none;
+      margin-left: 6px; /* 和倒计时拉开一点距离 */
+    }
+    @media (prefers-color-scheme: dark) {
+      .visa-tag { background: #4A2E15; color: #FFA940; }
+    }  
+    /* ZZY 名字旁的操作按钮组 */
+    .name-actions {
+      display: inline-flex;
+      gap: 6px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    
+    .visa-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #FFF3E0;
+      color: #FF8A00;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      .visa-tag { background: #4A2E15; color: #FFA940; }
+    }
+  
   </style>
 </head>
 <body>
@@ -286,7 +327,14 @@
     <!-- ZZY 卡片 -->
     <div class="flight-card">
       <div class="card-head">
-        <div class="person-name">ZZY</div>
+        <div class="person-name">
+          ZZY 
+          <div class="name-actions">
+            <a href="./zzy-visa.pdf" target="_blank" class="visa-tag">📄 签证</a>
+            <!-- 新增的 VEVO 链接 -->
+            <a href="https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/check-conditions-online" target="_blank" class="visa-tag" style="background: var(--blue-bg); color: var(--blue);">🔗 VEVO</a>
+          </div>
+        </div>
         <div class="countdown-badge zzy">距离起飞 <span class="cd-num" id="zzy-cd">--</span></div>
       </div>
       <div class="route-row">
