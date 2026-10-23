@@ -232,8 +232,13 @@
     .visa-tag {
       display: inline-flex; align-items: center; gap: 4px;
       background: var(--badge-bg); color: var(--amber);
-      padding: 3px 10px; border-radius: 999px;
-      font-size: 0.68rem; font-weight: 500; text-decoration: none;
+      padding: 5px 12px; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 500; text-decoration: none;
+    }
+    .visa-tag.vevo { color: var(--blue); }
+    .card-foot {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--hair);
     }
     .name-actions { display: inline-flex; gap: 6px; margin-left: 10px; vertical-align: middle; }
 
@@ -282,20 +287,13 @@
     
     <div class="header">
       <h1>首尔 · 釜山</h1>
-      <p>2026.10.30 - 2026.11.09</p>
+      <p>2026.10.30 出发 · 2人同行</p>
     </div>
 
     <!-- ZZY 卡片 -->
     <div class="flight-card">
       <div class="card-head">
-        <div class="person-name">
-          ZZY 
-          <div class="name-actions">
-            <a href="./zzy-visa.pdf" target="_blank" class="visa-tag">📄 签证</a>
-            <!-- 新增的 VEVO 链接 -->
-            <a href="https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/check-conditions-online" target="_blank" class="visa-tag" style="background: var(--blue-bg); color: var(--blue);">🔗 VEVO</a>
-          </div>
-        </div>
+        <div class="person-name">ZZY</div>
         <div class="countdown-badge zzy">距离起飞 <span class="cd-num" id="zzy-cd">--</span></div>
       </div>
       <div class="route-row">
@@ -307,6 +305,10 @@
         </div>
         <div class="airport-block right"><div class="airport-name">首尔</div><div class="airport-code">ICN</div><div class="airport-tz">KST (UTC+9)</div></div>
         <div class="time-block right"><div class="time-val" id="zzy-arr-time">--:--</div><div class="date-val" id="zzy-arr-date">--</div></div>
+      </div>
+      <div class="card-foot">
+        <a href="./zzy-visa.pdf" target="_blank" class="visa-tag">📄 签证</a>
+        <a href="https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/check-conditions-online" target="_blank" class="visa-tag vevo">🔗 VEVO</a>
       </div>
     </div>
 
