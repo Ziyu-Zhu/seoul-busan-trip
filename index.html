@@ -173,6 +173,104 @@
       .pdf-btn { background: #4A1A1A; color: #FF7875; }
     }
 
+    /* 让交通标签和 PDF 按钮平齐的容器 */
+    .action-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    /* 统一覆盖原来的标签样式，让它们看起来一样大 */
+    .action-row .trans-tag, 
+    .action-row .pdf-btn, 
+    .action-row .policy-btn {
+      margin-top: 0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 28px;
+    }
+
+    /* 保留 PDF 原有的颜色 */
+    .action-row .pdf-btn {
+      background: #FFF1F0; 
+      color: #FF4D4F;
+      text-decoration: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      .action-row .pdf-btn { background: #4A1A1A; color: #FF7875; }
+    }  
+  
+    /* 准备须知按钮 */
+    .policy-btn {
+      background: #FFF1F0; color: #FF4D4F; 
+      border: none; cursor: pointer;
+      font-family: inherit;
+    }
+    @media (prefers-color-scheme: dark) {
+      .policy-btn { background: #4A1A1A; color: #FF7875; }
+    }  
+
+    /* 自定义弹窗样式 */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--card);
+      width: 100%;
+      max-width: 480px;
+      border-radius: 20px 20px 0 0;
+      padding: 24px 20px;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .modal-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .modal-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: opacity 0.2s;
+    }
+    .modal-btn:active { opacity: 0.7; }
+    .naver-btn { background: #03C75A; color: white; }
+    .google-btn { background: #4285F4; color: white; }
+    .cancel-btn { background: var(--tag-bg); color: var(--text-sub); margin-bottom: 0; }  
+
     /* 底部说明 */
     .footer-note { text-align: center; font-size: 0.7rem; color: var(--text-light); margin-top: 12px; }
   </style>
@@ -237,6 +335,13 @@
       <div class="date-nav">
         <a href="#day1" class="date-btn active">10.30</a>
         <a href="#day2" class="date-btn">10.31</a>
+        <a href="#day3" class="date-btn">11.01</a>
+        <a href="#day4" class="date-btn">11.02</a>
+        <a href="#day5" class="date-btn">11.03</a>
+        <a href="#day6" class="date-btn">11.04</a>
+        <a href="#day7" class="date-btn">11.05</a>
+        <a href="#day8" class="date-btn">11.06</a>
+        <a href="#day9" class="date-btn">11.07</a>        
         <!-- 后续日期加在这里 -->
       </div>
     </div>
@@ -253,23 +358,26 @@
         <li class="t-item highlight">
           <div class="t-time">20:40</div><div class="t-dot"></div>
           <div class="t-content">
-            <div class="t-title"><a href="#" class="loc-link" onclick="chooseMap('仁川国际机场', 'ICN'); return false;">仁川机场碰头</a></div>
+            <!-- 删除了机场的链接 -->
+            <div class="t-title">仁川机场碰头</div>
             <div class="t-desc">CSR 20:40 抵达，与 ZZY 汇合。</div>
           </div>
         </li>
         <li class="t-item">
           <div class="t-time">22:00</div><div class="t-dot"></div>
           <div class="t-content">
-            <div class="t-title">
-              <a href="#" class="loc-link" onclick="chooseMap('Bread Hill Hotel', '首尔面包山酒店'); return false;">Bread Hill Hotel (面包山酒店)</a>
-            </div>
+            <!-- 名字不再是链接 -->
+            <div class="t-title">Bread Hill Hotel (面包山酒店)</div>
             <div class="t-desc">
               办理入住 (15:00后入住 / 11:00前退房)<br>
               电话: +82 10-4759-5128<br>
-              <span class="trans-tag">🚌 大巴 / 🚕 打车</span>
+              <!-- 地址变成了链接 -->
+              地址: <a href="#" class="loc-link" onclick="chooseMap('7 Jong-ro 18-gil, Jongno-gu, Seoul'); return false;">7 Jong-ro 18-gil, Jongno-gu, Seoul</a>
             </div>
-            <!-- 引入 PDF 链接 -->
-            <a href="./hotel.pdf" target="_blank" class="pdf-btn">📄 查看酒店订单凭证</a>
+            <div class="action-row">
+              <span class="trans-tag">🚌 大巴 / 🚕 打车</span>
+              <a href="./hotel.pdf" target="_blank" class="pdf-btn">📄 查看酒店订单凭证</a>
+            </div>
           </div>
         </li>
       </ul>
@@ -286,13 +394,26 @@
           <div class="t-time">9:30</div><div class="t-dot"></div>
           <div class="t-content"><div class="t-title">起床</div></div>
         </li>
+        
+        <!-- 色彩测试行程 -->
         <li class="t-item highlight">
-          <div class="t-time">11:30</div><div class="t-dot"></div>
+          <div class="t-time">11:00</div><div class="t-dot"></div>
           <div class="t-content">
-            <div class="t-title">小韩特产肤色测试</div>
-            <div class="t-desc">在 <a href="#" class="loc-link" onclick="chooseMap('弘大入口站', '弘大入口站'); return false;">弘大</a> 附近<br><span class="trans-tag">🚇 地铁</span></div>
+            <div class="t-title">Glow up package 肤色测试 (约3h40m)</div>
+            
+            <div class="t-desc" style="margin-bottom: 8px;">
+              📍 <strong>Hongdae Flagship Salon</strong><br>
+              <!-- 把具体地址变成可点击的链接，并带有专属短链接 -->
+              地址: <a href="#" class="loc-link" onclick="chooseMap('30-28 Jandari-ro, Mapo-gu, Seoul', 'https://naver.me/FvQJAQlb', 'https://maps.app.goo.gl/Q1GqkEXoSn5oback8'); return false;">30-28 Jandari-ro, Mapo-gu, Seoul</a><br>
+              交通: 弘大入口站 9号口出步行 600m (西桥洞教会前方)
+            </div>
+            
+            <div class="action-row">
+              <button class="policy-btn" onclick="showPolicyModal()">📋 准备须知</button>
+            </div>
           </div>
         </li>
+
         <li class="t-item">
           <div class="t-time">16:00</div><div class="t-dot"></div>
           <div class="t-content">
@@ -303,9 +424,389 @@
       </ul>
     </div>
 
+    <!-- Day 3 -->
+    <div class="day-section" id="day3">
+      <div class="day-header">
+        <div class="day-title">Day 3 · 圣水洞与汉江</div>
+        <div class="day-date">11月1日 周日</div>
+      </div>
+      <ul class="timeline-list">
+        <li class="t-item">
+          <div class="t-time">9:00</div><div class="t-dot"></div>
+          <div class="t-content"><div class="t-title">起床化妆</div></div>
+        </li>
+        <li class="t-item highlight">
+          <div class="t-time">11:00</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">圣水洞逛街</div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Seongsu-dong, Seongdong-gu, Seoul'); return false;">Seongsu-dong, Seongdong-gu, Seoul</a><br>
+              <span class="trans-tag">🚇 地铁</span>
+            </div>
+          </div>
+        </li>
+        <li class="t-item">
+          <div class="t-time">16:30</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">纛岛汉江公园</div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Ttukseom Hangang Park, 139 Gangbyeonbuk-ro, Gwangjin-gu, Seoul'); return false;">Ttukseom Hangang Park, 139 Gangbyeonbuk-ro, Gwangjin-gu, Seoul</a><br>
+              从圣水洞步行或公交前往，赶在日落前到江边<br>
+              <span class="trans-tag">🚶 步行 / 🚌 公交</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+        <!-- Day 4 -->
+    <div class="day-section" id="day4">
+      <div class="day-header">
+        <div class="day-title">Day 4 · 经典首尔</div>
+        <div class="day-date">11月2日 周一</div>
+      </div>
+      <ul class="timeline-list">
+        <li class="t-item">
+          <div class="t-time">9:00</div><div class="t-dot"></div>
+          <div class="t-content"><div class="t-title">起床化妆</div></div>
+        </li>
+        <li class="t-item highlight">
+          <div class="t-time">11:00</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">韩国国立现代美术馆 </div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('National Museum of Modern and Contemporary Art, Seoul'); return false;">National Museum of Modern and Contemporary Art, Seoul</a><br>
+              如果遇到闭馆，可直接前往北村。<br>
+              <span class="trans-tag">🚇 地铁</span>
+            </div>
+          </div>
+        </li>
+        <li class="t-item">
+          <div class="t-time">14:00</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">北村韩屋村 + 三清洞</div>
+            <div class="t-desc">
+              北村地址: <a href="#" class="loc-link" onclick="chooseMap('Bukchon Hanok Village, Seoul'); return false;">Bukchon Hanok Village</a><br>
+              三清洞地址: <a href="#" class="loc-link" onclick="chooseMap('Samcheong-dong, Jongno-gu, Seoul'); return false;">Samcheong-dong, Jongno-gu</a>
+            </div>
+          </div>
+        </li>
+        <li class="t-item">
+          <div class="t-time">19:00</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">明洞 或 首尔塔</div>
+            <div class="t-desc">
+              明洞地址: <a href="#" class="loc-link" onclick="chooseMap('Myeong-dong, Jung-gu, Seoul'); return false;">Myeong-dong, Jung-gu</a><br>
+              首尔塔地址: <a href="#" class="loc-link" onclick="chooseMap('N Seoul Tower, Seoul'); return false;">N Seoul Tower</a><br>
+              <span class="trans-tag">🚇 地铁</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Day 5 -->
+    <div class="day-section" id="day5">
+      <div class="day-header">
+        <div class="day-title">Day 5 · 狎鸥亭与汉南洞</div>
+        <div class="day-date">11月3日 周二</div>
+      </div>
+      <ul class="timeline-list">
+        <li class="t-item">
+          <div class="t-time">10:00</div><div class="t-dot"></div>
+          <div class="t-content"><div class="t-title">起床化妆</div></div>
+        </li>
+        <li class="t-item highlight">
+          <div class="t-time">12:00</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">狎鸥亭</div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Apgujeong-dong, Gangnam-gu, Seoul'); return false;">Apgujeong-dong, Gangnam-gu</a><br>
+              适合吃午饭、逛街。<br>
+              <span class="trans-tag">🚇 地铁</span>
+            </div>
+          </div>
+        </li>
+        <li class="t-item">
+          <div class="t-time">下午</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">汉南洞</div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Hannam-dong, Yongsan-gu, Seoul'); return false;">Hannam-dong, Yongsan-gu</a><br>
+              餐吧酒吧多，适合悠闲喝咖啡。<br>
+              <span class="trans-tag">🚕 打车</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Day 6 -->
+    <div class="day-section" id="day6">
+      <div class="day-header">
+        <div class="day-title">Day 6 · 前往釜山</div>
+        <div class="day-date">11月4日 周三</div>
+      </div>
+      <ul class="timeline-list">
+        <li class="t-item">
+          <div class="t-time">9:00</div><div class="t-dot"></div>
+          <div class="t-content"><div class="t-title">起床收拾行李</div></div>
+        </li>
+        
+        <!-- KTX 行程 -->
+        <li class="t-item highlight">
+          <div class="t-time">11:30</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">前往首尔站 / 乘坐 KTX</div>
+            <div class="t-desc">
+              首尔站地址: <a href="#" class="loc-link" onclick="chooseMap('Seoul Station, Seoul'); return false;">Seoul Station</a><br>
+              车次时间: <strong>12:16 - 14:58</strong><br>
+            </div>
+            <!-- KTX 订单网页链接 (新窗口打开) -->
+            <div class="action-row">
+              <a href="https://www.korail.com/global/eng/myReservation" target="_blank" class="trans-tag" style="text-decoration: none; color: var(--blue); background: var(--blue-bg);">
+                🎫 查看 KTX 车票
+              </a>
+            </div>
+          </div>
+        </li>
+
+        <!-- 釜山酒店入住 -->
+        <li class="t-item">
+          <div class="t-time">15:00</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">Haeundae Hound Signature Hotel</div>
+            <div class="t-desc">
+              办理入住 (15:00后入住 / 11:00前退房)<br>
+              电话: 0082-51-9347000<br>
+              地址: <a href="#" class="loc-link" onclick="chooseMap('15 Haeundae-ro 594beon-gil, Haeundae-gu, Busan'); return false;">15 Haeundae-ro 594beon-gil, Haeundae-gu, Busan</a><br>
+            </div>
+            <!-- 釜山酒店凭证 -->
+            <div class="action-row">
+              <a href="./busan-hotel.pdf" target="_blank" class="pdf-btn">📄 查看釜山酒店凭证</a>
+            </div>
+          </div>
+        </li>
+
+        <!-- 晚上散步 -->
+        <li class="t-item">
+          <div class="t-time">晚上</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">海云台海水浴场</div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Haeundae Beach, Busan'); return false;">Haeundae Beach</a><br>
+              收拾之后去海边散步。
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Day 7 -->
+    <div class="day-section" id="day7">
+      <div class="day-header">
+        <div class="day-title">Day 7 · 胶囊列车与滑车</div>
+        <div class="day-date">11月5日 周四</div>
+      </div>
+      <ul class="timeline-list">
+        <li class="t-item">
+          <div class="t-time">8:30</div><div class="t-dot"></div>
+          <div class="t-content"><div class="t-title">起床化妆，尽早出门</div></div>
+        </li>
+        
+        <!-- 胶囊小火车 -->
+        <li class="t-item highlight">
+          <div class="t-time">9:00</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">海云台蓝线公园 (买票/乘坐)</div>
+            <div class="t-desc">
+              📍 打车定位: 부산광역시 해운대구 달맞이길62번길 13<br>
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Busan Haeundae-gu Dalmaji-gil 62beon-gil 13'); return false;">Busan Haeundae-gu Dalmaji-gil 62beon-gil 13</a><br>
+              9:00 前抵达尾浦站排队买票，买好票后乘坐胶囊小火车。<br>
+              <span class="trans-tag">🚶 步行 10mins / 🚕 打车</span>
+            </div>
+          </div>
+        </li>
+
+        <!-- Skyline Luge -->
+        <li class="t-item">
+          <div class="t-time">中午</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">Skyline Luge 斜坡滑车</div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Skyline Luge Busan, 35-1 Gijang-daero 394beon-gil, Dong-gu, Busan'); return false;">Skyline Luge Busan (东区)</a><br>
+              包含缆车和滑车，非常好玩！从海云台打车过去约 25 分钟。<br>
+              <span class="trans-tag">🚕 建议打车</span>
+            </div>
+          </div>
+        </li>
+
+        <!-- 广安里 -->
+        <li class="t-item">
+          <div class="t-time">傍晚</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">广安里海水浴场</div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Gwangalli Beach, Busan'); return false;">Gwangalli Beach</a><br>
+              看广安大桥夜景，在海边吃晚餐。<br>
+              <span class="trans-tag">🚕 建议打车</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Day 8 -->
+    <div class="day-section" id="day8">
+      <div class="day-header">
+        <div class="day-title">Day 8 · 白浅滩与购物</div>
+        <div class="day-date">11月6日 周五</div>
+      </div>
+      <ul class="timeline-list">
+        <li class="t-item">
+          <div class="t-time">10:00</div><div class="t-dot"></div>
+          <div class="t-content"><div class="t-title">起床化妆</div></div>
+        </li>
+        
+        <li class="t-item highlight">
+          <div class="t-time">11:00</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">白浅滩文化村</div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Huinnyeoul Culture Village, Busan'); return false;">Huinnyeoul Culture Village</a><br>
+              看海景、逛文艺小店，喝咖啡。<br>
+              <span class="trans-tag">🚕 建议打车 (约25mins)</span>
+            </div>
+          </div>
+        </li>
+
+        <li class="t-item">
+          <div class="t-time">下午</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">南浦洞 逛街购物</div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Nampo-dong, Busan'); return false;">Nampo-dong</a><br>
+              白浅滩离南浦洞很近，可以逛街、吃小吃、买美妆。<br>
+              <span class="trans-tag">🚕 打车 / 🚌 巴士</span>
+            </div>
+          </div>
+        </li>
+
+        <li class="t-item">
+          <div class="t-time">傍晚</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">西面 逛街购物 (备选)</div>
+            <div class="t-desc">
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Seomyeon, Busan'); return false;">Seomyeon</a><br>
+              如果南浦洞逛得差不多了，可以坐地铁去西面（换乘枢纽站）继续吃逛，然后直接坐2号线回海云台。<br>
+              <span class="trans-tag">🚇 地铁</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Day 9 -->
+    <div class="day-section" id="day9">
+      <div class="day-header">
+        <div class="day-title">Day 9 · 返程回国</div>
+        <div class="day-date">11月7日 周六</div>
+      </div>
+      <ul class="timeline-list">
+        <li class="t-item">
+          <div class="t-time">7:00</div><div class="t-dot"></div>
+          <div class="t-content"><div class="t-title">起床退房</div></div>
+        </li>
+        
+        <!-- KTX 返程 -->
+        <li class="t-item highlight">
+          <div class="t-time">8:39</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">KTX 返回首尔</div>
+            <div class="t-desc">
+              釜山站 → 首尔站 (08:39 - 11:24)<br>
+              釜山站地址: <a href="#" class="loc-link" onclick="chooseMap('Busan Station, Busan'); return false;">Busan Station</a><br>
+              <span class="trans-tag">🚕 打车 / 🚇 地铁 (需提前1小时出门)</span>
+            </div>
+            <div class="action-row">
+              <a href="https://www.korail.com/global/eng/myReservation" target="_blank" class="trans-tag" style="text-decoration: none; color: var(--blue); background: var(--blue-bg);">
+                🎫 查看 KTX 车票
+              </a>
+            </div>
+          </div>
+        </li>
+
+        <!-- 换乘去机场 -->
+        <li class="t-item">
+          <div class="t-time">11:24</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">抵达首尔站，换乘机场快线 (AREX)</div>
+            <div class="t-desc">
+              乘坐机场快线直达仁川机场（直达列车约43分钟，普通列车约60分钟）。<br>
+            </div>
+          </div>
+        </li>
+
+        <!-- 航班起飞 -->
+        <li class="t-item highlight">
+          <div class="t-time">16:10</div><div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-title">航班 MU5012 起飞回国</div>
+            <div class="t-desc">
+              仁川 T1 → 上海浦东 T1 (16:10 - 17:20)<br>
+              仁川机场地址: <a href="#" class="loc-link" onclick="chooseMap('Incheon International Airport'); return false;">Incheon International Airport</a><br>
+              建议 13:00 左右抵达机场，办理托运、退税及免税店提货。<br>
+            </div>
+            <div class="action-row">
+              <a href="./flight.pdf" target="_blank" class="pdf-btn">📄 机票行程单</a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
     <div class="footer-note">起降时间均为当地时间 · 点击地点可选择导航</div>
   </div>
 
+<!-- 自定义地图选择弹窗 -->
+<div id="mapModal" class="modal-overlay" onclick="closeMapModal()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-title">选择导航方式</div>
+    <div class="modal-desc" id="mapModalDest">目的地</div>
+    <button class="modal-btn naver-btn" onclick="openNaverMap()">Naver Map（推荐韩国境内）</button>
+    <button class="modal-btn google-btn" onclick="openGoogleMap()">Google 地图</button>
+    <button class="modal-btn cancel-btn" onclick="closeMapModal()">取消</button>
+  </div>
+</div>
+<!-- 准备须知 弹窗 -->
+<div id="policyModal" class="modal-overlay" onclick="closePolicyModal()">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto; text-align: left;">
+    <div class="modal-title" style="margin-bottom: 16px;">Glow up 准备须知</div>
+    
+    <div style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.6;">
+      <strong style="color: var(--text-main);">1. 面诊 (Consultation)</strong><br>
+      需素颜（包含防晒霜），可在店内卸妆。请佩戴透明隐形眼镜或框架眼镜，<strong>请勿佩戴美瞳</strong>。<br>
+      <em style="opacity: 0.8;">Consultation is conducted with makeup removed (including sunscreen). May remove at store. Please prepare clear contact lenses or glasses instead of colored lenses.</em><br><br>
+
+      <strong style="color: var(--text-main);">2. 上衣 (Tops)</strong><br>
+      需穿着轻薄吊带（能清晰看出身体轮廓）。<br>
+      <em style="opacity: 0.8;">A thin camisole is required. Please wear a lightweight camisole that clearly shows your silhouette.</em><br><br>
+
+      <strong style="color: var(--text-main);">3. 下装 (Bottoms)</strong><br>
+      请穿着可卷至膝盖以上的下装，推荐轻薄短裤。<br>
+      <em style="opacity: 0.8;">Please wear bottoms that can be rolled up above the knee. Thin shorts are recommended.</em><br><br>
+
+      <span style="color: #FF8A00; font-weight: bold;">★ 如果没带这些衣物也没关系，直接来店里即可，不用担心。 ★</span><br>
+      <em style="color: #FF8A00; opacity: 0.8;">★ If it’s difficult to bring the items, it’s totally fine to come without them. ★</em><br><br>
+
+      <strong style="color: #FF4D4F;">✳️ 迟到政策 (Late Arrival Policy)</strong><br>
+      如果迟到，咨询仍会在原定时间结束，体验时长将相应缩短。请准时到达。<br>
+      <em style="opacity: 0.8;">If you arrive late, your consultation will still end at the originally scheduled time, and the length of your session will be reduced accordingly.</em>
+    </div>
+
+    <button class="modal-btn cancel-btn" onclick="closePolicyModal()" style="margin-top: 20px;">我知道了</button>
+  </div>
+</div>
   <script>
     // 绝对时刻定义
     const ZZY_DEP = new Date("2026-10-30T12:15:00+11:00");
@@ -369,20 +870,55 @@
     }
     updateTimers();
 
-    // 唤起地图选择
-    function chooseMap(queryEn, queryZh) {
-      // 用原生 confirm 选择弹窗
-      const useNaver = confirm("要使用 Naver Map 导航吗？\n\n点击【确定】使用 Naver Map\n点击【取消】使用 Google 地图");
+    // 全局变量存储当前选择的目的地
+    let currentDestEn = '';
+    let currentDestNaverUrl = '';
+    let currentDestGoogleUrl = '';
+
+    // 打开弹窗
+    function chooseMap(queryEn, naverUrl = '', googleUrl = '') {
+      currentDestEn = queryEn;
+      currentDestNaverUrl = naverUrl;
+      currentDestGoogleUrl = googleUrl;
       
-      if (useNaver) {
-        // 韩国的 Naver 地图搜索链接格式
-        window.open(`https://map.naver.com/v5/search/${encodeURIComponent(queryZh)}`, '_blank');
-      } else {
-        // Google 地图链接
-        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryEn)}`, '_blank');
+      document.getElementById('mapModalDest').textContent = queryEn;
+      document.getElementById('mapModal').classList.add('active');
+    }
+
+    // 关闭弹窗
+    function closeMapModal() {
+      document.getElementById('mapModal').classList.remove('active');
+    }
+
+    // 打开 Naver Map
+    function openNaverMap() {
+      closeMapModal();
+      
+      if (currentDestNaverUrl) {
+        window.location.href = currentDestNaverUrl;
+      } else if (currentDestEn) {
+        const encodedQuery = encodeURIComponent(currentDestEn);
+        window.location.href = `nmap://search?query=${encodedQuery}&appname=com.ziyu.travel`;
+        setTimeout(() => {
+          if (document.visibilityState === 'visible') {
+            window.open(`https://map.naver.com/v5/search/${encodedQuery}`, '_blank');
+          }
+        }, 2000);
       }
     }
 
+    // 打开 Google Maps
+    function openGoogleMap() {
+      closeMapModal();
+      
+      if (currentDestGoogleUrl) {
+        window.open(currentDestGoogleUrl, '_blank');
+      } else if (currentDestEn) {
+        const encodedQuery = encodeURIComponent(currentDestEn);
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodedQuery}`, '_blank');
+      }
+    }
+    
     // 导航栏点击平滑滚动 + 激活状态
     const navBtns = document.querySelectorAll('.date-btn');
     navBtns.forEach(btn => {
@@ -397,6 +933,14 @@
         }
       });
     });
+
+    // 打开/关闭 准备须知弹窗
+    function showPolicyModal() {
+      document.getElementById('policyModal').classList.add('active');
+    }
+    function closePolicyModal() {
+      document.getElementById('policyModal').classList.remove('active');
+    }  
   </script>
 </body>
 </html>
