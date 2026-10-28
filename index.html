@@ -30,10 +30,8 @@
       --badge-bg: rgba(255,255,255,0.78);
       --glass: rgba(255,255,255,0.65);
       --card-shadow: 0 10px 30px rgba(190,150,160,0.13);
-      /* 航班卡片渐变 */
       --fz-a: #E8F0FB; --fz-b: #F2EBFA;
       --fc-a: #E8F4EC; --fc-b: #F6F4E6;
-      /* 每日主题色：t=底色  i=点缀色 */
       --t1: #FCEBEC; --i1: #D9808A;
       --t2: #EAF1FA; --i2: #6F97C4;
       --t3: #E8F4EC; --i3: #6FA683;
@@ -166,6 +164,8 @@
     }
     .date-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; overflow: visible; }
 
+    .nav-break { flex-basis: 100%; height: 0; }
+
     .date-btn {
       width: calc((100% - 24px) / 5); text-align: center;
       padding: 7px 0; border-radius: 999px;
@@ -280,6 +280,79 @@
 
     /* 底部说明 */
     .footer-note { text-align: center; font-size: 0.68rem; color: var(--text-light); margin-top: 20px; letter-spacing: 0.04em; }
+  
+    /* 地图图片弹窗专属样式 (居中 + 可滚动) */
+    .map-img-wrap {
+      width: 100%;
+      max-height: 65vh; /* 限制高度，防止图片太长撑爆屏幕 */
+      overflow-y: auto; /* 允许上下滑动查看全图 */
+      overflow-x: hidden;
+      border-radius: 12px;
+      background: var(--bg);
+      -webkit-overflow-scrolling: touch; /* 苹果手机丝滑滚动 */
+    }
+    .map-img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    /* 覆盖原有的底部弹窗样式，强制居中 */
+    #mapImageModal.modal-overlay {
+      align-items: center; /* 垂直居中 */
+      padding: 20px;
+    }
+    #mapImageModal .modal-content {
+      border-radius: 20px; /* 改成全圆角 */
+      max-width: 90%;
+      animation: zoomIn 0.3s ease; /* 改用放大动画 */
+    }
+    @keyframes zoomIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+      /* 回到顶部悬浮按钮 */
+    .back-to-top {
+      position: fixed;
+      bottom: 32px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      background: var(--nav-bg);
+      -webkit-backdrop-filter: saturate(180%) blur(16px);
+      backdrop-filter: saturate(180%) blur(16px);
+      border: 1px solid var(--hair);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-sub);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      z-index: 999; /* 确保在最上层，但不遮挡弹窗 */
+    }
+    
+    .back-to-top.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .back-to-top:active {
+      background: var(--tag-bg);
+      transform: scale(0.92);
+    }
+    
+    /* 深色模式下微调阴影 */
+    @media (prefers-color-scheme: dark) {
+      .back-to-top {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      }
+    }
+  
   </style>
 </head>
 <body>
@@ -341,6 +414,14 @@
       </div>
     </div>
 
+    <script>
+      // 10.31 起（按韩国时间 00:00）航班信息卡片直接消失
+      if (Date.now() >= new Date("2026-10-31T00:00:00+09:00").getTime()) {
+        document.querySelectorAll(".flight-card").forEach(function (el) { el.remove(); });
+      }
+    </script>
+
+
     <!-- ================= 日期导航 (吸顶) ================= -->
     <div class="date-nav-wrap">
       <div class="date-nav">
@@ -352,8 +433,13 @@
         <a href="#day6" class="date-btn">11.04</a>
         <a href="#day7" class="date-btn">11.05</a>
         <a href="#day8" class="date-btn">11.06</a>
-        <a href="#day9" class="date-btn">11.07</a>        
-        <!-- 后续日期加在这里 -->
+        <a href="#day9" class="date-btn">11.07</a>
+        <div class="nav-break"></div>
+        <!-- 攻略导航 -->
+        <a href="#guide-shop" class="date-btn">购物</a>
+        <a href="#guide-food" class="date-btn">美食</a>
+        <a href="#guide-subway" class="date-btn">地铁</a>
+        <a href="#guide-tips" class="date-btn" style="color: var(--rose);">注意</a>
       </div>
     </div>
 
@@ -369,7 +455,6 @@
         <li class="t-item highlight">
           <div class="t-time">20:40</div><div class="t-dot"></div>
           <div class="t-content">
-            <!-- 删除了机场的链接 -->
             <div class="t-title">仁川机场碰头</div>
             <div class="t-desc">CSR 20:40 抵达，与 ZZY 汇合。</div>
           </div>
@@ -377,12 +462,10 @@
         <li class="t-item">
           <div class="t-time">22:00</div><div class="t-dot"></div>
           <div class="t-content">
-            <!-- 名字不再是链接 -->
             <div class="t-title">Bread Hill Hotel (面包山酒店)</div>
             <div class="t-desc">
               办理入住 (15:00后入住 / 11:00前退房)<br>
               电话: +82 10-4759-5128<br>
-              <!-- 地址变成了链接 -->
               地址: <a href="#" class="loc-link" onclick="chooseMap('7 Jong-ro 18-gil, Jongno-gu, Seoul'); return false;">7 Jong-ro 18-gil, Jongno-gu, Seoul</a>
             </div>
             <div class="action-row">
@@ -406,7 +489,6 @@
           <div class="t-content"><div class="t-title">起床</div></div>
         </li>
         
-        <!-- 色彩测试行程 -->
         <li class="t-item highlight">
           <div class="t-time">11:00</div><div class="t-dot"></div>
           <div class="t-content">
@@ -414,7 +496,6 @@
             
             <div class="t-desc" style="margin-bottom: 8px;">
               📍 <strong>Hongdae Flagship Salon</strong><br>
-              <!-- 把具体地址变成可点击的链接，并带有专属短链接 -->
               地址: <a href="#" class="loc-link" onclick="chooseMap('30-28 Jandari-ro, Mapo-gu, Seoul', 'https://naver.me/FvQJAQlb', 'https://maps.app.goo.gl/Q1GqkEXoSn5oback8'); return false;">30-28 Jandari-ro, Mapo-gu, Seoul</a><br>
               交通: 弘大入口站 9号口出步行 600m (西桥洞教会前方)
             </div>
@@ -430,6 +511,25 @@
           <div class="t-content">
             <div class="t-title">弘大/延南洞逛吃</div>
             <div class="t-desc">体验首尔年轻人的街区氛围</div>
+            <!-- 六个按钮并排 -->
+            <div class="action-row">
+              <button class="policy-btn" onclick="showMapImage('./hongdae-map.jpg')">🗺️ 查看文创店地图</button>
+              <a href="https://xhslink.cn/o/1ebRcdIxvfe" target="_blank" class="policy-btn" style="text-decoration: none;">
+                🔗 小红书弘大文创店
+              </a>
+              <a href="https://xhslink.cn/o/9Ai8nYYmQV2" target="_blank" class="policy-btn" style="text-decoration: none;">
+                🔗 小红书弘大新店
+              </a>
+              <a href="https://www.threads.com/share/_kOgFAk9X/" target="_blank" class="policy-btn" style="text-decoration: none;">
+                🔗 脆攻略1
+              </a>
+              <a href="https://www.threads.com/share/BASfQamliS/" target="_blank" class="policy-btn" style="text-decoration: none;">
+                🔗 脆攻略2
+              </a>
+              <a href="https://www.threads.com/share/BAXF6JNX72/" target="_blank" class="policy-btn" style="text-decoration: none;">
+                🔗 脆延禧洞攻略
+              </a>
+            </div>
           </div>
         </li>
       </ul>
@@ -451,8 +551,16 @@
           <div class="t-content">
             <div class="t-title">圣水洞逛街</div>
             <div class="t-desc">
-              地址: <a href="#" class="loc-link" onclick="chooseMap('Seongsu-dong, Seongdong-gu, Seoul'); return false;">Seongsu-dong, Seongdong-gu, Seoul</a><br>
+              地址: <a href="#" class="loc-link" onclick="chooseMap('Seongsu-dong, Seongdong-gu, Seoul'); return false;">Seongsu-dong, Seongdong-gu, Seoul</a>
+            </div>
+            <div class="action-row">
               <span class="trans-tag">🚇 地铁</span>
+              <a href="https://www.threads.com/share/BAheTzmnz-/" target="_blank" class="trans-tag" style="text-decoration: none; ">
+                🔗 脆攻略
+              </a>
+              <a href="https://www.threads.com/share/_7oUx9ckC/" target="_blank" class="trans-tag" style="text-decoration: none; ">
+                🔗 脆首尔林攻略
+              </a>
             </div>
           </div>
         </li>
@@ -470,7 +578,7 @@
       </ul>
     </div>
 
-        <!-- Day 4 -->
+    <!-- Day 4 -->
     <div class="day-section" id="day4">
       <div class="day-header">
         <div class="day-title">Day 4 · 经典首尔</div>
@@ -499,6 +607,15 @@
             <div class="t-desc">
               北村地址: <a href="#" class="loc-link" onclick="chooseMap('Bukchon Hanok Village, Seoul'); return false;">Bukchon Hanok Village</a><br>
               三清洞地址: <a href="#" class="loc-link" onclick="chooseMap('Samcheong-dong, Jongno-gu, Seoul'); return false;">Samcheong-dong, Jongno-gu</a>
+            </div>
+            <div class="action-row">
+              <button class="policy-btn" onclick="showMapImage('./bukchon-map.jpg')">🗺️ 查看步行路线图</button>
+              <a href="https://www.threads.com/share/BAV5jAVQ_U/" target="_blank" class="policy-btn" style="text-decoration: none;">
+                🔗 脆西村攻略
+              </a>
+              <a href="https://xhslink.cn/o/33MhEP3Zdvo" target="_blank" class="policy-btn" style="text-decoration: none;">
+                🔗 小红书北村文创店攻略
+              </a>
             </div>
           </div>
         </li>
@@ -533,8 +650,13 @@
             <div class="t-title">狎鸥亭</div>
             <div class="t-desc">
               地址: <a href="#" class="loc-link" onclick="chooseMap('Apgujeong-dong, Gangnam-gu, Seoul'); return false;">Apgujeong-dong, Gangnam-gu</a><br>
-              适合吃午饭、逛街。<br>
+              适合吃午饭、逛街。
+            </div>
+            <div class="action-row">
               <span class="trans-tag">🚇 地铁</span>
+              <a href="https://www.threads.com/share/BAZ9rIUmQS/" target="_blank" class="policy-btn" style="text-decoration: none;">
+                🔗 脆攻略
+              </a>
             </div>
           </div>
         </li>
@@ -544,8 +666,13 @@
             <div class="t-title">汉南洞</div>
             <div class="t-desc">
               地址: <a href="#" class="loc-link" onclick="chooseMap('Hannam-dong, Yongsan-gu, Seoul'); return false;">Hannam-dong, Yongsan-gu</a><br>
-              餐吧酒吧多，适合悠闲喝咖啡。<br>
+              餐吧酒吧多，适合悠闲喝咖啡。
+            </div>
+            <div class="action-row">
               <span class="trans-tag">🚕 打车</span>
+              <a href="https://www.threads.com/share/BAXniQ6YQ1/" target="_blank" class="policy-btn" style="text-decoration: none;">
+                🔗 脆汉南洞攻略
+              </a>
             </div>
           </div>
         </li>
@@ -564,7 +691,6 @@
           <div class="t-content"><div class="t-title">起床收拾行李</div></div>
         </li>
         
-        <!-- KTX 行程 -->
         <li class="t-item highlight">
           <div class="t-time">11:30</div><div class="t-dot"></div>
           <div class="t-content">
@@ -573,7 +699,6 @@
               首尔站地址: <a href="#" class="loc-link" onclick="chooseMap('Seoul Station, Seoul'); return false;">Seoul Station</a><br>
               车次时间: <strong>12:16 - 14:58</strong><br>
             </div>
-            <!-- KTX 订单网页链接 (新窗口打开) -->
             <div class="action-row">
               <a href="https://www.korail.com/global/eng/myReservation" target="_blank" class="trans-tag" style="text-decoration: none; color: var(--blue); background: var(--blue-bg);">
                 🎫 查看 KTX 车票
@@ -582,7 +707,6 @@
           </div>
         </li>
 
-        <!-- 釜山酒店入住 -->
         <li class="t-item">
           <div class="t-time">15:00</div><div class="t-dot"></div>
           <div class="t-content">
@@ -592,14 +716,12 @@
               电话: 0082-51-9347000<br>
               地址: <a href="#" class="loc-link" onclick="chooseMap('15 Haeundae-ro 594beon-gil, Haeundae-gu, Busan'); return false;">15 Haeundae-ro 594beon-gil, Haeundae-gu, Busan</a><br>
             </div>
-            <!-- 釜山酒店凭证 -->
             <div class="action-row">
               <a href="./busan-hotel.pdf" target="_blank" class="pdf-btn">📄 查看釜山酒店凭证</a>
             </div>
           </div>
         </li>
 
-        <!-- 晚上散步 -->
         <li class="t-item">
           <div class="t-time">晚上</div><div class="t-dot"></div>
           <div class="t-content">
@@ -625,7 +747,6 @@
           <div class="t-content"><div class="t-title">起床化妆，尽早出门</div></div>
         </li>
         
-        <!-- 胶囊小火车 -->
         <li class="t-item highlight">
           <div class="t-time">9:00</div><div class="t-dot"></div>
           <div class="t-content">
@@ -639,7 +760,6 @@
           </div>
         </li>
 
-        <!-- Skyline Luge -->
         <li class="t-item">
           <div class="t-time">中午</div><div class="t-dot"></div>
           <div class="t-content">
@@ -652,7 +772,6 @@
           </div>
         </li>
 
-        <!-- 广安里 -->
         <li class="t-item">
           <div class="t-time">傍晚</div><div class="t-dot"></div>
           <div class="t-content">
@@ -706,11 +825,17 @@
         <li class="t-item">
           <div class="t-time">傍晚</div><div class="t-dot"></div>
           <div class="t-content">
-            <div class="t-title">西面 逛街购物 (备选)</div>
+            <div class="t-title">西面 & 田浦洞 逛街购物</div>
             <div class="t-desc">
-              地址: <a href="#" class="loc-link" onclick="chooseMap('Seomyeon, Busan'); return false;">Seomyeon</a><br>
-              如果南浦洞逛得差不多了，可以坐地铁去西面（换乘枢纽站）继续吃逛，然后直接坐2号线回海云台。<br>
-              <span class="trans-tag">🚇 地铁</span>
+              西面地址: <a href="#" class="loc-link" onclick="chooseMap('Seomyeon, Busan'); return false;">Seomyeon</a><br>
+              田浦洞地址: <a href="#" class="loc-link" onclick="chooseMap('Jeonpo-dong, Busanjin-gu, Busan'); return false;">Jeonpo-dong</a><br>
+              田浦洞被称为“釜山弘大”，有很多文创店（如 Object）、古着店和咖啡馆。逛完直接在西面坐2号线回海云台。
+            </div>
+            <div class="action-row" style="flex-wrap: nowrap; gap: 6px; margin-top: 8px;">
+              <span class="trans-tag" style="margin-top: 0;">🚇 地铁</span>
+              <a href="https://xhslink.cn/o/8u6xlpSNKXT" target="_blank" class="policy-btn" style="text-decoration: none; white-space: nowrap;">
+                🔗 田浦洞攻略
+              </a>
             </div>
           </div>
         </li>
@@ -729,7 +854,6 @@
           <div class="t-content"><div class="t-title">起床退房</div></div>
         </li>
         
-        <!-- KTX 返程 -->
         <li class="t-item highlight">
           <div class="t-time">8:39</div><div class="t-dot"></div>
           <div class="t-content">
@@ -747,7 +871,6 @@
           </div>
         </li>
 
-        <!-- 换乘去机场 -->
         <li class="t-item">
           <div class="t-time">11:24</div><div class="t-dot"></div>
           <div class="t-content">
@@ -758,7 +881,6 @@
           </div>
         </li>
 
-        <!-- 航班起飞 -->
         <li class="t-item highlight">
           <div class="t-time">16:10</div><div class="t-dot"></div>
           <div class="t-content">
@@ -774,6 +896,537 @@
           </div>
         </li>
       </ul>
+    </div>
+
+    <!-- 地铁攻略 -->
+    <div class="day-section" id="guide-subway" style="--tint: var(--tag-bg); --ink: var(--text-sub);">
+      <div class="day-header">
+        <div class="day-title">地铁出口攻略</div>
+        <div class="day-date">首尔地铁防迷路指南</div>
+      </div>
+      <div class="t-desc" style="padding-left: 4px; font-size: 0.8rem; line-height: 1.8;">
+        
+        <p style="font-weight: 700; color: var(--text-main); margin-top: 10px;">🚇 弘大入口 (2号线)</p>
+        <p>3号口：直通延南洞，两边都是吃喝<br>
+        4号口：出来是 AK&百货，很多潮牌和文创<br>
+        6号口：直通京义线书街<br>
+        7号口：有手扶梯，带行李走这里<br>
+        8号口：主街入口，出来就是 Olive Young<br>
+        9号口：直走是弘大正门，街头表演集中区</p>
+        <p style="color: var(--amber); font-weight: 500; margin-bottom: 12px;">⚠️ 注意：手扶梯是 3/4号出口，直梯是 8号出口</p>
+
+        <p style="font-weight: 700; color: var(--text-main);">🚇 明洞 (4号线)</p>
+        <p>3号口：漫画街、南山缆车、首尔塔方向<br>
+        5号口：新世界免税店、南大门方向<br>
+        6号口：明洞主街<br>
+        7号口：主商圈，有手扶梯，带行李走这里</p>
+        <p style="color: var(--amber); font-weight: 500; margin-bottom: 12px;">⚠️ 注意：手扶梯是 1/3/7号出口，直梯是 1号出口</p>
+
+        <p style="font-weight: 700; color: var(--text-main);">🚇 汉南洞·汉江镇 (6号线)</p>
+        <p>3号口：出来直走到尽头后，右手边马路是不爬坡路线<br>
+        2号口：有寄物柜</p>
+        <p style="color: var(--amber); font-weight: 500; margin-bottom: 12px;">⚠️ 注意：2号出口有手扶梯，3号出口是直梯</p>
+
+        <p style="font-weight: 700; color: var(--text-main);">🚇 圣水站 (2号线)</p>
+        <p>1号口：出来是 Point of View<br>
+        2号口：很多咖啡厅、餐厅<br>
+        3号口：网红鱼板、顺大在这边<br>
+        4号口：出来右转是最大 Olive Young，直走就是主街</p>
+        <p style="color: var(--amber); font-weight: 500;">⚠️ 注意：手扶梯是 1/2/3/4号出口，直梯在 1/4号出口</p>
+
+      </div>
+    </div>
+
+    <!-- 购物 (买什么 + 逛街 合并) -->
+    <div class="day-section" id="guide-shop" style="--tint: var(--amber-bg); --ink: var(--amber);">
+      <div class="day-header">
+        <div class="day-title">购物</div>
+        <div class="day-date">待买清单 & 商圈逛街指南</div>
+      </div>
+      
+      <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main); margin: 4px 4px 10px;">🧴 待买清单</div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">1. ilso 一苏 卸妆油 (200ml)</div>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">
+          可以搓出黑头，清洁力强，不假滑不糊眼睛。非常适合油皮使用。Olive Young 经常有 1+1 或半价折扣（约 12000 韩元）。<br>
+          <em style="opacity: 0.8;">韩文名：일소 수퍼 멜팅 세범 클렌징오일</em>
+        </div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">2. Anua 77% 鱼腥草系列</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">
+          韩国近年大热的舒缓镇定爆款（棉片或爽肤水），非常适合痘痘肌和敏感肌。Olive Young 常年热销。<br>
+          <em style="opacity: 0.8;">韩文名：아누아 어성초 77% 수딩 토너 / 수딩 토너 패드</em>
+        </div>
+      </div>
+
+      <!-- ================= 待买清单 / 逛街 分隔 ================= -->
+      <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main); margin: 26px 4px 6px;">🛍 逛街</div>
+      <div style="font-size: 0.75rem; color: var(--text-sub); margin: 0 4px 10px;">商圈 & 文创手帐打卡指南</div>
+
+      <!-- ================= 弘大/延南洞 ================= -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 4px 12px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">📍 弘大 / 延南洞</div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">✍️ 延南洞 2-5 Little Tempo</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">
+          店面在二楼，光线明亮，色彩鲜明。贴纸、亚克力板等小东西都偏卡通，很可爱很有趣，逛完会心情很好。
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">
+          📍 地址: <a href="#" class="loc-link" onclick="chooseMap('리틀템포 디자인 샵'); return false;">리틀템포 디자인 샵</a>
+        </div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">✍️ 延南洞 6-9 Peipeorian</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">
+          一进店就有很强的木质香，本子种类很多，且每种分类都有店员写的使用说明。笔类试用纸上写满了大家的留言，特别可爱。
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">
+          📍 地址: <a href="#" class="loc-link" onclick="chooseMap('페이퍼리안'); return false;">페이퍼리안 (Peipeorian)</a>
+        </div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">✍️ 延南洞 10-14 Seumulteu Ronseu Tele</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">
+          <strong>强烈推荐！</strong>可以DIY本子，自己选纸，封面免费，店员现场装订。30张起装订，适合对纸质要求高的人。
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">
+          📍 地址: <a href="#" class="loc-link" onclick="chooseMap('스물트 론슈 텔레'); return false;">스물트 론슈 텔레</a>
+        </div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">🏢 合井站 套章大楼 (1-3层)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">
+          <strong>1F ODOM：</strong>开门最早，店面很大，插画师gongjang的店。<br>
+          <strong>2F thanks books：</strong>书店，可盖章，有伴手礼。有抽签和画画小活动，互动感强。<br>
+          <strong>3F rolledpaint / punctum：</strong>买胶带、明信片、贴纸、便签。<br>
+          <span style="color: var(--blue); font-weight: 500;">💡 重点：这三家店在一栋楼里，按顺序逛有套章，每层可叠盖，最后是一栋楼的画面！</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">
+          📍 地址: <a href="#" class="loc-link" onclick="chooseMap('그린디자인웍스 공장 ODOM'); return false;">ODOM (합정역)</a>
+        </div>
+      </div>
+
+
+      <!-- ================= 西村/景福宫/北村 ================= -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 4px 12px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">📍 西村 / 北村 / 景福宫</div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">✍️ All Write</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">
+          人很多的一家店，基础好用的胶带款式多，色系丰富，很容易挑花眼。
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">
+          📍 地址: <a href="#" class="loc-link" onclick="chooseMap('올라이트 서촌점'); return false;">올라이트 서촌점 (All Write 西村店)</a>
+        </div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">✍️ analogue keeper (papR)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">
+          首尔手帐店“朝圣”必去！主推 pagebook（小巧便携）。店里有试写区，可自由盖章创作。
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">
+          📍 地址: <a href="#" class="loc-link" onclick="chooseMap('파피어프로스트'); return false;">파피어프로스트 (西村)</a>
+        </div>
+      </div>
+
+
+      <!-- ================= 明洞 / 大创 ================= -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 4px 12px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">📍 明洞 / 大创合集</div>
+      </div>
+
+      <!-- 明洞大创攻略卡片 -->
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">
+          🛒 明洞大创 (DAISO) 12层分层攻略
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px; line-height: 1.6;">
+          <strong>💡 推荐路线：</strong><br>
+          美妆控先去 <strong>2F</strong> → 买零食去 <strong>5F</strong> → 找旅行用品去 <strong>12F</strong> → 最后回 1F 结账！
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">
+          📍 地址: <a href="#" class="loc-link" onclick="chooseMap('다이소 명동역점'); return false;">다이소 명동역점 (首尔中区退溪路 134-1)</a><br>
+          🚇 交通: 4号线明洞站 1、2号出口附近
+        </div>
+      </div>
+
+      <!-- 大创好逛店铺合集卡片 -->
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 12px;">
+          🏆 首尔大创好逛店铺合集
+        </div>
+        
+        <div style="font-size: 0.8rem; color: var(--text-sub); line-height: 1.7;">
+          <p style="margin-bottom: 12px;">
+            <strong>1. 永登浦区厅店 (神中之神)</strong><br>
+            货品全、人不多、大平层、分区合理，店比较新，完全神中之神。<br>
+            📍 <a href="#" class="loc-link" onclick="chooseMap('다이소 영등포구청점'); return false;">다이소 영등포구청점</a>
+          </p>
+          <p style="margin-bottom: 12px;">
+            <strong>2. 新村店</strong><br>
+            放学后人多，共三层，分区合理东西齐全，地理位置极其方便。<br>
+            📍 <a href="#" class="loc-link" onclick="chooseMap('다이소 신촌점'); return false;">다이소 신촌점</a>
+          </p>
+          <p style="margin-bottom: 12px;">
+            <strong>3. 똑섬역店 (首尔林附近)</strong><br>
+            <span style="color: var(--rose); font-weight: 500;">重点：微针不限量！</span>货虽然没有12层那家全，但也绝对够逛了。大平层一层搞定，地理位置很方便。<br>
+            📍 <a href="#" class="loc-link" onclick="chooseMap('다이소 뚝섬역점'); return false;">다이소 뚝섬역점</a>
+          </p>
+          <p style="margin-bottom: 12px;">
+            <strong>4. 松坡区厅站店</strong><br>
+            很大的大平层，货品超级齐全，有好多东西只在这家店见过。（注意：周五晚人巨多）<br>
+            📍 <a href="#" class="loc-link" onclick="chooseMap('다이소 송파구청점'); return false;">다이소 송파구청점</a>
+          </p>
+          <p style="margin-bottom: 12px;">
+            <strong>5. 延禧店</strong><br>
+            共两三层，化妆品区就在一进门，想买的基本都可以在一层搞定，人不多，很好逛。<br>
+            📍 <a href="#" class="loc-link" onclick="chooseMap('다이소 연희점'); return false;">다이소 연희점</a>
+          </p>
+          <p style="margin-bottom: 4px;">
+            <strong>6. 龙山 iPark 店</strong><br>
+            地理位置极为突出，所以人暴多……但东西也比较全。<br>
+            📍 <a href="#" class="loc-link" onclick="chooseMap('다이소 용산아이파크몰점'); return false;">다이소 용산아이파크몰점</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 吃什么 -->
+    <div class="day-section" id="guide-food" style="--tint: var(--rose-bg); --ink: var(--rose);">
+      <div class="day-header">
+        <div class="day-title">美食</div>
+        <div class="day-date">首尔 & 釜山美食清单</div>
+      </div>
+
+      <!-- ================= 弘大/延南洞 ================= -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 4px 12px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">📍 弘大 / 延南洞</div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">1. 罗正顺辣炒章鱼 (李光洙推荐)</div>
+          <a href="https://www.threads.com/share/BBntW_rBMY/" target="_blank" style="font-size: 0.7rem; color: var(--text-sub); background: var(--tag-bg); padding: 2px 8px; border-radius: 999px; text-decoration: none;">原帖 ↗</a>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">小章鱼非常入味，吃完之后加炒饭也超级好吃。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('나정순할매쭈꾸미'); return false;">나정순할매쭈꾸미</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">2. 바다회사랑 (延南洞生鱼片)</div>
+          <a href="https://www.threads.com/share/_u2_QP-c3/" target="_blank" style="font-size: 0.7rem; color: var(--text-sub); background: var(--tag-bg); padding: 2px 8px; border-radius: 999px; text-decoration: none;">原帖 ↗</a>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">韩国式生鱼片店，生鱼片切得超级厚，非常肥美，配菜也超级多。一盆约 7w 韩元，3-4人吃足够。强烈建议中午/下午去。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('바다회사랑'); return false;">바다회사랑</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">3. 순순안남 (延南洞酱腌海鲜)</div>
+          <a href="https://www.threads.com/share/_u2_QP-c3/" target="_blank" style="font-size: 0.7rem; color: var(--text-sub); background: var(--tag-bg); padding: 2px 8px; border-radius: 999px; text-decoration: none;">原帖 ↗</a>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">创意韩餐，主打熟成酱腌海鲜，一盘里有三文鱼、虾、螃蟹等。酱蟹调味层次很丰富，泡菜饼也很好吃。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('순순안남'); return false;">순순안남</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">4. 맛이차이나 美味China (李光洙推荐)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">李光洙推荐美食。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('맛이차이나'); return false;">맛이차이나</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">5. 마포곱창타운 (麻浦烤肠)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">弘大附近的烤肠名店，喜欢韩式烤牛肠/猪肠的不要错过，烤得焦脆流油，是下酒绝配。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('마포곱창타운'); return false;">마포곱창타운</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">6. 연남주막1987 (延南酒幕)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">超有氛围的复古韩式小酒馆（大排档风格），非常适合晚上逛完街来吃宵夜喝米酒。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('연남주막1987'); return false;">연남주막1987</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">7. 鳗鱼饭 (해목)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">笔记推荐打卡。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('해목'); return false;">해목</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">8. EXO痛苦鱼饼小摊</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">追星打卡必去。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('서울 마포구 동교동 164-17'); return false;">首尔麻浦区东桥洞 164-17</a></div>
+      </div>
+
+
+      <!-- ================= 圣水洞 ================= -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 4px 12px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">📍 圣水洞</div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">9. 보끔당 (韩式炖鸡)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">非常传统的韩国口味，分量很大，搭配的土豆饼超级好吃。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('보끔당 성수점'); return false;">보끔당 성수점</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">10. 봉추찜닭 (炖鸡)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">味道很像新疆大盘鸡，调味偏中式，里面的粉条超级美味。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('봉추찜닭 성수나낙점'); return false;">봉추찜닭 성수나낙점</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">11. 圣水洞酸奶碗</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">在盐面包旁边，两人分享一碗刚好。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('성수동 요거트볼'); return false;">圣水洞内 (近盐面包)</a></div>
+      </div>
+
+
+      <!-- ================= 明洞/东大门/中区 ================= -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 4px 12px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">📍 明洞 / 东大门 / 中区</div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">12. 药水酱猪蹄 (약수참숯불닭갈비)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">评分高达 4.9 的本地老店，口味是炭烤酱猪蹄，非常入味。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('약수참숯불닭갈비'); return false;">약수참숯불닭갈비</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">13. 新堂肉 (신당육)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">评分 4.9、评论数 4000+ 的烤肉天花板！店里有专人帮烤。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('신당육'); return false;">신당육</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">14. 金大猪食堂 (금돼지식당)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;"><strong>米其林指南 2026 推荐！</strong>顶级猪肉专门店，建议一定要提早去排号。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('금돼지식당'); return false;">금돼지식당</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">15. 乙支路名家 (을지로 명가)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">评分 4.5 的宝藏烤肠店，主打烤盲肠、烤大肠、烤毛肚。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('을지로명가'); return false;">을지로명가</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">16. 하동관 河东馆 (李光洙推荐)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">老字号牛肉汤饭。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('하동관 명동본점'); return false;">하동관 명동본점</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">17. 명동교자 明洞饺子 (李光洙推荐)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">明洞必吃的老字号刀切面。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('명동교자 본점'); return false;">명동교자 본점</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">18. 铁锅泡菜五花肉</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">明洞某评能搜到（直接翻译是铁锅泡菜三合一）。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('명동 철锅김치 삼겹살'); return false;">明洞某评搜索</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">19. 宝宝饭店</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">韩剧同款四件套，面偏腻但值得尝。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('바오바오반점'); return false;">바오바오반점 (明洞/中区)</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">20. 满足五香猪脚</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">笔记推荐的猪脚店。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('만족오향족발'); return false;">만족오향족발 (中区)</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">21. 24-hours bone gamjatang</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">24小时营业的脊骨土豆汤。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('24시 뼈다귀 감자탕'); return false;">24시 뼈다귀 감자탕</a></div>
+      </div>
+
+
+      <!-- ================= 新龙山/龙山 ================= -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 4px 12px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">📍 新龙山 / HYBE 附近</div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">22. 우동키노야 (乌冬木屋)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">不愧为乌冬专门店。推荐 30cm 炸虾天妇罗乌冬和 3日熟成炸鸡块乌冬。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('우동키노야 신용산본점'); return false;">우동키노야 신용산본점</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">23. 용산삼계탕 (龙山参鸡汤)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">参鸡汤不是浓稠挂的，清甜好喝。两人点两份半鸡汤加一份土豆饼刚刚好。⚠️ 中文菜单没有便宜的半鸡汤，一定要看韩文菜单。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('용산삼계탕'); return false;">용산삼계탕</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">24. 죠죠 (JOJO 铁板烧)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">《黑白大厨》里的餐厅，晚上情侣排队的热门铁板烧。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('죠죠 용산점'); return false;">죠죠 용산점</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">25. 이여곰탕 (韩牛汤饭)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">韩牛汤饭，牛肉质量极好，清淡的美味。吃完还可以自己打冰淇淋。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('이여곰탕 용산점'); return false;">이여곰탕 용산점</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">26. 샘샘샘 (Sam Sam Sam)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">《黑白大厨》的餐厅。千层面、面疙瘩好吃，整体稍微有点难消化。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('샘샘샘 용산점'); return false;">샘샘샘 용산점</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">27. 潜水桥烤肉</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">五花肉为主打，小菜丰富，年糕汤配烤肉绝配，扇贝香菇有特色，本地人很多。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('잠수교집'); return false;">잠수교집 (龙山/新龙山一带)</a></div>
+      </div>
+
+
+      <!-- ================= 西村/汝矣岛/江南 ================= -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 4px 12px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">📍 西村 / 汝矣岛 / 江南</div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">28. 안덕 安德 (西村, 李光洙推荐)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">西村美食。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('안덕'); return false;">안덕</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">29. 일산칼국수 一山刀切面 (李光洙推荐)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">李光洙推荐美食。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('일산칼국수'); return false;">일산칼국수</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">30. 여의도 진주집 汝矣岛晋州家 (豆浆面🥇)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">李光洙推荐的第1名豆浆面。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('여의도 진주집'); return false;">여의도 진주집</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">31. 서소문동 진주회관 西小门洞晋州会馆 (豆浆面🥈)</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">李光洙推荐的第2名豆浆面。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('진주회관'); return false;">진주회관</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">32. 土俗村参鸡汤</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">景福宫附近超有名的参鸡汤。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('토속촌삼계탕'); return false;">토속촌삼계탕</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">33. 江南面屋</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">江南美食。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('강남면옥'); return false;">강남면옥</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">34. standard bread</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">网红面包店。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('스탠다드브레드'); return false;">스탠다드브레드</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">35. rain report rainbow</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">咖啡厅/甜品。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('레인리포트 레인보우'); return false;">레인리포트 레인보우</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">36. 广津桥8号</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">网红打卡点。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('광진교 8번가'); return false;">광진교 8번가</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">37. 乐天世界枫之谷</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">游乐场/餐饮打卡。</div>
+        <div style="font-size: 0.8rem; color: var(--text-sub);">📍 地址: <a href="#" class="loc-link" onclick="chooseMap('롯데월드'); return false;">롯데월드</a></div>
+      </div>
+
+      <div style="background: var(--bg); border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 6px;">38. BHC炸鸡</div>
+
+    <!-- 逛街 -->
+    <!-- 注意事项 -->
+    <div class="day-section" id="guide-tips" style="--tint: var(--rose-bg); --ink: var(--rose);">
+      <div class="day-header">
+        <div class="day-title">注意事项</div>
+        <div class="day-date">韩国旅行生存指南</div>
+      </div>
+      
+      <div style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.7; padding: 0 4px;">
+        
+        <p style="font-weight: 800; color: var(--text-main); font-size: 0.95rem; margin-bottom: 10px;">
+          1. 垃圾分类与丢弃
+        </p>
+        <p style="margin-bottom: 8px;">
+          <strong style="color: var(--text-main);">a. 便利店与街头：</strong><br>
+          在便利店买的东西可以在店内垃圾桶扔，但<strong>有汤水、没吃完的食物和冰块，必须先倒在店内的“食物垃圾桶”</strong>（通常是带滤网的脚踏桶），包装再按标识分类回收。<br>
+          <span style="color: var(--rose); font-weight: 500;">⚠️ 路上产生的垃圾，绝对不要丢进路边商家或住户的垃圾袋和纸箱里！</span>除非是那种一看就是公共使用的大垃圾袋或垃圾桶才可以丢。
+        </p>
+        <p style="margin-bottom: 8px;">
+          <strong style="color: var(--text-main);">b. 快餐店与咖啡店：</strong><br>
+          在汉堡店/星巴克等需要自己回收餐具的店，没喝完的饮料和冰块需单独倒入液体回收口，垃圾倒到指定处，托盘放到指定位置。大部分咖啡店需要自己主动归还杯子，主动归还不容易出错。
+        </p>
+        <p style="margin-bottom: 8px;">
+          <strong style="color: var(--text-main);">c. Mega 等连锁店：</strong><br>
+          只需归还店内的循环杯，液体和用过的吸管不用管，固体纸质垃圾和吸管包装丢到吧台的小垃圾桶即可。
+        </p>
+        <p style="margin-bottom: 8px;">
+          <strong style="color: var(--text-main);">d. 机场与地铁站：</strong><br>
+          丢垃圾比较方便，但有个别垃圾桶也需要把液体倒掉后再扔。
+        </p>
+        <p style="margin-bottom: 20px; color: var(--text-main); font-weight: 500;">
+          出门在外语言不通，建议按照韩国日常要求行事，谨慎为妙，避免遇到偏激的人。
+        </p>
+
+        <p style="font-weight: 800; color: var(--text-main); font-size: 0.95rem; margin-bottom: 10px;">
+          2. 财物丢失
+        </p>
+        <p style="margin-bottom: 8px;">
+          <strong style="color: var(--text-main);">a. 主观遗失（自己弄丢）：</strong><br>
+          韩国法律规定，自己丢失的东西，7天内只能做“遗失申告”，警察无法直接立案调监控。建议先上 <a href="https://www.lost112.go.kr" target="_blank" style="color: var(--blue); text-decoration: underline;">Lost112 官网</a> 刷一刷，并给警察留 KakaoTalk 随时沟通。
+        </p>
+        <p style="margin-bottom: 8px;">
+          <strong style="color: var(--text-main);">b. 被他人拿走（走事件申告）：</strong><br>
+          如果离开10分钟原地东西就不见了，推测被拿走，<strong>一定要直接报案</strong>（打112原地等警察）。陈述时务必强调“怀疑被人拿走”，这样警察才会立案并帮你调监控。
+        </p>
+        <p style="margin-bottom: 8px;">
+          <strong style="color: var(--text-main);">c. 交通工具高效找回（比报案快）：</strong><br>
+          🚇 <strong>地铁：</strong>直接找地铁站客服中心。<br>
+          🚌 <strong>公交：</strong>在 Naver 查该线路的运输公司电话，联系办公室。<br>
+          🚕 <strong>出租车：</strong>记得车牌号，直接联系所属出租车公司。
+        </p>
+
+      </div>
     </div>
 
     <div class="footer-note">起降时间均为当地时间 · 点击地点可选择导航</div>
@@ -818,6 +1471,14 @@
     <button class="modal-btn cancel-btn" onclick="closePolicyModal()" style="margin-top: 20px;">我知道了</button>
   </div>
 </div>
+
+<!-- 回到顶部悬浮按钮 -->
+<div id="backToTop" class="back-to-top" onclick="scrollToTop()">
+  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</div>
+
   <script>
     // 绝对时刻定义
     const ZZY_DEP = new Date("2026-10-30T12:15:00+11:00");
@@ -835,7 +1496,10 @@
       return new Intl.DateTimeFormat("zh-CN", { timeZone: tz, month: "2-digit", day: "2-digit" }).format(date);
     }
 
+    const flightCardsExist = !!document.getElementById("zzy-cd");
+
     // 渲染时间
+    if (flightCardsExist) {
     document.getElementById("zzy-dep-time").textContent = fmtT(ZZY_DEP, "Australia/Sydney");
     document.getElementById("zzy-dep-date").textContent = fmtD(ZZY_DEP, "Australia/Sydney");
     document.getElementById("zzy-arr-time").textContent = fmtT(ZZY_ARR, "Asia/Seoul");
@@ -849,12 +1513,14 @@
     document.getElementById("csr-dep2-date").textContent = fmtD(CSR_DEP2, "Asia/Shanghai");
     document.getElementById("csr-arr2-time").textContent = fmtT(CSR_ARR2, "Asia/Seoul");
     document.getElementById("csr-arr2-date").textContent = fmtD(CSR_ARR2, "Asia/Seoul");
+    }
 
     // 倒计时逻辑
     const zzyCdEl = document.getElementById("zzy-cd");
     const csrCdEl = document.getElementById("csr-cd");
 
     function updateTimers() {
+      if (!flightCardsExist) return;
       const now = Date.now();
       
       const diffZ = ZZY_DEP.getTime() - now;
@@ -952,6 +1618,57 @@
     function closePolicyModal() {
       document.getElementById('policyModal').classList.remove('active');
     }  
+    
+    // 显示地图大图弹窗
+    function showMapImage(imgSrc) {
+      let existingModal = document.getElementById('mapImageModal');
+      if (existingModal) existingModal.remove();
+
+      const modalHTML = `
+        <div id="mapImageModal" class="modal-overlay" onclick="closeMapImage()">
+          <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="map-img-wrap">
+              <img src="${imgSrc}" alt="路线地图">
+            </div>
+            <button class="modal-btn cancel-btn" onclick="closeMapImage()" style="margin-top: 15px;">关闭</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+      setTimeout(() => {
+        document.getElementById('mapImageModal').classList.add('active');
+      }, 10);
+    }
+
+    function closeMapImage() {
+      const modal = document.getElementById('mapImageModal');
+      if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+      }
+    }
+    
+    // 回到顶部逻辑
+    const backToTopBtn = document.getElementById('backToTop');
+
+    // 监听滚动事件，控制按钮显隐 (向下滑动超过 400px 时显示)
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) {
+        backToTopBtn.classList.add('show');
+      } else {
+        backToTopBtn.classList.remove('show');
+      }
+    });
+
+    // 平滑滚动回顶部
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }  
+
   </script>
 </body>
 </html>
